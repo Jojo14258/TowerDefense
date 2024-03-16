@@ -16,6 +16,7 @@ try:
 
     ### Initialisation
     model = Model()
+    modelZombie = Model()
     view = View(model)
     controller = Controller(model)
 
@@ -24,12 +25,16 @@ try:
     model.ajouter_bouton(bouton1)
 
     # le personnage et son image:
-    perso = Personnage()
+    perso = Personnage(str("perso"),False) #2 attributs, nom et si NPC
+    zombie1 = Personnage(str("zombie1")) 
+    zombie1.set_position((701,301))
     perso.set_position((300, 300))
     model.personnage = perso
-
+    modelZombie.personnage = zombie1
+    
     vue_perso = ViewPersonnage(perso)
     view.add_elem(vue_perso)
+    view.add_elem(ViewPersonnage(zombie1))
 
     ### Boucle du jeu
     # chaque tour de boucle est un 'pas' dans le jeux
@@ -38,6 +43,7 @@ try:
         controller.gerer_input()
         # puis la logique du jeu
         model.update()
+        modelZombie.update()
         # puis on affiche
         view.draw()
 

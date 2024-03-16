@@ -3,11 +3,11 @@
 ### View
 # Ce module comporte le code pour afficher le jeu
 
-import pygame
+import pygame, os
 
 # des constantes
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 800
+SCREEN_WIDTH = 866
+SCREEN_HEIGHT = 514
 couleur_boutons = (150, 150, 150)
 couleur_fond = (25,200,25)
 
@@ -19,11 +19,11 @@ class View:
     def __init__(self, model):
         # on connecte la vue à l'état interne du jeu
         self.model = model
-
         # l'écran du jeu
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-        pygame.display.set_caption("Planet Simulation")
-
+        pygame.display.set_caption("image")
+        self.imp = pygame.image.load("./ressources/jardin.png").convert()
+        
         # liste des éléments à afficher
         self.elems = []
 
@@ -37,9 +37,9 @@ class View:
         """
         Fonction appellée à la fin de chaque tour de simulation du jeu
         """
-
+        self.screen.blit(self.imp, (0, 0))
         # redessine le fond si besoin:
-        self.screen.fill(couleur_fond)
+        #self.screen.fill(couleur_fond)
 
         # deplace les elements du jeux
         for elem in self.elems:
@@ -70,14 +70,36 @@ class ViewPersonnage(pygame.sprite.Sprite):
 
         # les attributs de la classe
         self.personnage = personnage
+        self.sprites = []   #séquence d'image pour l'animation
+        self.actuelle = 0
         # l'image du personnage
-        self.image = pygame.image.load("ressources/personnage.png")
-        self.image = pygame.transform.scale(self.image, (30, 30))
+        
+        print("zombie" in str(personnage.nom))
+        if "zombie" in str(personnage.nom):
+            for i in range(1, len(os.listdir(f"ressources/{str(personnage.nom)}_marche"))):
+                self.image = pygame.image.load(f"ressources/{str(personnage.nom)}_marche/frame-{i}.gif")
+                self.sprites.append(self.image)    #Initialisation d'un tableau contenant l'ensemble des image d'animation
+            self.image = self.sprites[self.actuelle]
+            self.image = pygame.transform.scale(self.image, (226, 153))
+            self.rect = self.image.get_rect()
+            
+            
+                
+            self.image = pygame.image.load(f"ressources/{str(personnage.nom)}.gif") #si c'est un zombie, on met la version gif
+            
+        else:
+            self.image = pygame.image.load("ressources/personnage.png") #si c'est le truc controlable du joueur, on met un .Png
+            self.image = pygame.transform.scale(self.image, (30, 30))
+            self.sprites.append(self.image)
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = self.personnage.get_position()
-
-    def update(self):
+        
+    def update(self):  
         self.rect.x, self.rect.y = self.personnage.get_position()
+        self.actuelle += 0.0150
+        if self.actuelle >= len(self.sprites):
+            self.actuelle = 0.0110
+        self.image = self.sprites[int(self.actuelle)]
 
     def draw(self, screen):
         nouvelle_position = self.personnage.get_position()

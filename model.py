@@ -48,9 +48,14 @@ class Personnage:
     NOTE: ca ne concerne pas l'affichage (View), que le modéle (M)
     """
 
-    def __init__(self):
+    def __init__(self, nom, NPC=True):
+        """
+        NPC - : Bool, True si il s'agit d'un personnage contrôlable par le joueur, fase sinon.
+        """
         self.x = 0
         self.y = 0
+        self.nom = nom
+        self.NPC = NPC
 
     def get_position(self):
         return (self.x, self.y)
@@ -60,14 +65,17 @@ class Personnage:
 
     def deplacer(self, direction):
 
-        if direction == "haut":
-            self.y += -STEP_SIZE
-        if direction == "bas":
-            self.y -= -STEP_SIZE
-        if direction == "droite":
-            self.x -= -STEP_SIZE
-        if direction == "gauche":
-            self.x += -STEP_SIZE
+        if not(self.NPC):
+            if direction == "haut":
+                self.y += -STEP_SIZE
+            if direction == "bas":
+                self.y -= -STEP_SIZE
+            if direction == "droite":
+                self.x -= -STEP_SIZE
+            if direction == "gauche":
+                self.x += -STEP_SIZE
 
     def update(self):
-        pass
+        if self.NPC:
+            self.x -= 0.010 #vitesse déplacement
+            self.set_position((self.x, self.y))
