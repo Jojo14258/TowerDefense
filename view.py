@@ -76,16 +76,8 @@ class ViewPersonnage(pygame.sprite.Sprite):
         
         print("zombie" in str(personnage.nom))
         if "zombie" in str(personnage.nom):
-            for i in range(1, len(os.listdir(f"ressources/{str(personnage.nom)}_marche"))):
-                self.image = pygame.image.load(f"ressources/{str(personnage.nom)}_marche/frame-{i}.gif")
-                self.sprites.append(self.image)    #Initialisation d'un tableau contenant l'ensemble des image d'animation
-            self.image = self.sprites[self.actuelle]
-            self.image = pygame.transform.scale(self.image, (226, 153))
-            self.rect = self.image.get_rect()
+            self.TabAnimation(personnage)
             
-            
-                
-            self.image = pygame.image.load(f"ressources/{str(personnage.nom)}.gif") #si c'est un zombie, on met la version gif
             
         else:
             self.image = pygame.image.load("ressources/personnage.png") #si c'est le truc controlable du joueur, on met un .Png
@@ -93,13 +85,31 @@ class ViewPersonnage(pygame.sprite.Sprite):
             self.sprites.append(self.image)
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = self.personnage.get_position()
+    
+    def TabAnimation(self, personnage):
+        """
+        personnage : - l'objet de classe personnage
+        Génère un tableau d'animation à dérouler. L'animation se fait en fonction de la valeur dans l'attribut
+        personnage.nom
+        Voir vidéo https://www.youtube.com/watch?v=MYaxPa_eZS0
+        """
+        for i in range(1, len(os.listdir(f"ressources/{str(personnage.nom)}_marche"))):
+                self.image = pygame.image.load(f"ressources/{str(personnage.nom)}_marche/frame-{i}.gif")
+                self.sprites.append(self.image)    #Initialisation d'un tableau contenant l'ensemble des image d'animation
+        self.image = self.sprites[self.actuelle]
+        self.image = pygame.transform.scale(self.image, (226, 153))
+        self.rect = self.image.get_rect()
+        #self.image = pygame.image.load(f"ressources/{str(personnage.nom)}.gif") #si c'est un zombie, on met la version gif
+        
+    def animer(self, personnage, vitesse=0.0150):
+        self.rect.x, self.rect.y = self.personnage.get_position()
+        self.actuelle += vitesse
+        if self.actuelle >= len(self.sprites):
+            self.actuelle = 0
+        self.image = self.sprites[int(self.actuelle)]
         
     def update(self):  
-        self.rect.x, self.rect.y = self.personnage.get_position()
-        self.actuelle += 0.0150
-        if self.actuelle >= len(self.sprites):
-            self.actuelle = 0.0110
-        self.image = self.sprites[int(self.actuelle)]
+        self.animer(self.personnage)
 
     def draw(self, screen):
         nouvelle_position = self.personnage.get_position()

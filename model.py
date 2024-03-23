@@ -8,6 +8,20 @@ import pygame
 # des constantes
 STEP_SIZE = 20
 
+def map(x, y):
+    longueur = 64  #debut = 284 - 220 
+    largeur = 81  #235 - 154
+    departy = (y-largeur)
+    dictTuiles = {}
+    for y in range(0,5):
+        departx = x
+        numero = 9*(y)+1
+        while numero <= 9*y+9:
+            dictTuiles[numero] = [departx, departx+longueur], [departy, departy+largeur]
+            departx += longueur
+            numero += 1
+        departy += largeur
+    return dictTuiles
 class Model:
     """
     Une classe qui contient tous les éléments logiques du jeux

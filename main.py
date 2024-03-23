@@ -1,8 +1,3 @@
-# Auteurs:
-
-### Main pour notre jeu
-# L'architecture du jeu utilise trois modules selon le patron de conception MVC
-
 import pygame
 
 pygame.init()
@@ -19,7 +14,21 @@ try:
     modelZombie = Model()
     view = View(model)
     controller = Controller(model)
-
+    #print(map(220,  154))
+    
+    dictiTuile = map(220,  155) #génération d'une matrice
+    for key, value in dictiTuile.items():  #On réarrange les imperfection causé par les irrégularités du terrain
+        if key >= 5:
+            dictiTuile[key][0][1] += 25
+            dictiTuile[key][0][0] += 25
+            
+        elif key >= 3:
+            dictiTuile[key][0][1] += 10
+            dictiTuile[key][0][0] += 10
+        
+    dictiTuile[2][0][1] += 10
+    dictiTuile[4][0][1] += 15
+    print(dictiTuile)
     # les boutons:
     bouton1 = Bouton("bouton1", 30, 30, 100, 50, "clique")
     model.ajouter_bouton(bouton1)
@@ -36,6 +45,9 @@ try:
     view.add_elem(vue_perso)
     view.add_elem(ViewPersonnage(zombie1))
 
+    
+
+
     ### Boucle du jeu
     # chaque tour de boucle est un 'pas' dans le jeux
     while not model.done:
@@ -46,6 +58,15 @@ try:
         modelZombie.update()
         # puis on affiche
         view.draw()
+        #pygame.draw.line(view.screen, (255,0,0), (dictiTuile[9][0][0], dictiTuile[9][1][0]), (dictiTuile[9][0][1], dictiTuile[9][1][0]), 3)
+        #pygame.draw.line(view.screen, (255,0,0), (dictiTuile[9][0][0], dictiTuile[9][1][0]), (dictiTuile[9][0][0], dictiTuile[9][1][1]), 3)
+
+        pygame.display.flip()
+        for keys, value in dictiTuile.items():
+            pygame.draw.line(view.screen, (255,0,0), (value[0][0], value[1][0]), (value[0][0], value[1][1]), 3)
+            pygame.draw.line(view.screen, (255,0,0), (value[0][0], value[1][0]), (value[0][1], value[1][0]), 3)
+            
+            pygame.display.flip()
 
 except Exception as e:
     pygame.quit()
