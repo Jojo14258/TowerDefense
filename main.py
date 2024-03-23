@@ -18,18 +18,57 @@ try:
     
     dictiTuile = map(220,  155) #génération d'une matrice
     for key, value in dictiTuile.items():  #On réarrange les imperfection causé par les irrégularités du terrain
-        if key >= 26:
+        if key >= 45:
+            dictiTuile[key][0][1] += 40
+            dictiTuile[key][0][0] += 40
+        elif key >= 44:
+            dictiTuile[key][0][1] += 30
+            dictiTuile[key][0][0] += 30
+        elif key >= 43:
+            dictiTuile[key][0][1] += 25
+            dictiTuile[key][0][0] += 25
+        elif key >= 42:
             dictiTuile[key][0][1] += 20
             dictiTuile[key][0][0] += 20
-        elif key >= 25:
-            dictiTuile[key][0][1] += 20
-            dictiTuile[key][0][0] += 20
-        elif key >= 24:
-            dictiTuile[key][0][1] += 7
-            dictiTuile[key][0][0] += 7
-        if key >=22:
+        elif key >= 41:
             dictiTuile[key][0][1] += 15
             dictiTuile[key][0][0] += 15
+        elif key >= 40:
+            dictiTuile[key][0][1] += 10
+            dictiTuile[key][0][0] += 10
+        elif key >= 38:
+            dictiTuile[key][0][1] += 10
+            dictiTuile[key][0][0] += 10
+            
+        elif key >= 37:
+            dictiTuile[key][0][1] -= 10
+            dictiTuile[key][0][0] -= 10
+            
+        elif key >= 36:
+            dictiTuile[key][0][1] += 40
+            dictiTuile[key][0][0] += 40
+        elif key >= 33:
+            dictiTuile[key][0][1] += 25
+            dictiTuile[key][0][0] += 25
+            
+        elif key >= 31:
+            dictiTuile[key][0][1] += 20
+            dictiTuile[key][0][0] += 20
+        elif key >= 29:
+            dictiTuile[key][0][1] += 10
+            dictiTuile[key][0][0] += 10
+        elif key >= 28:
+            dictiTuile[key][0][1] -= 5
+            dictiTuile[key][0][0] -= 5
+        elif key >= 25:
+            dictiTuile[key][0][1] += 35
+            dictiTuile[key][0][0] += 35
+        elif key >=24:
+            dictiTuile[key][0][1] += 20
+            dictiTuile[key][0][0] += 20
+        elif key >=22:
+            dictiTuile[key][0][1] += 20
+            dictiTuile[key][0][0] += 20
         elif key >= 21:
             dictiTuile[key][0][1] += 5
             dictiTuile[key][0][0] += 5
@@ -62,7 +101,7 @@ try:
         elif key >= 10:
             dictiTuile[key][0][1] -= 2
             dictiTuile[key][0][0] -= 2
-        if key >= 5:
+        elif key >= 5:
             dictiTuile[key][0][1] += 25
             dictiTuile[key][0][0] += 25
             
