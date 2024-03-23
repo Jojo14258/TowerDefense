@@ -18,6 +18,50 @@ try:
     
     dictiTuile = map(220,  155) #génération d'une matrice
     for key, value in dictiTuile.items():  #On réarrange les imperfection causé par les irrégularités du terrain
+        if key >= 26:
+            dictiTuile[key][0][1] += 20
+            dictiTuile[key][0][0] += 20
+        elif key >= 25:
+            dictiTuile[key][0][1] += 20
+            dictiTuile[key][0][0] += 20
+        elif key >= 24:
+            dictiTuile[key][0][1] += 7
+            dictiTuile[key][0][0] += 7
+        if key >=22:
+            dictiTuile[key][0][1] += 15
+            dictiTuile[key][0][0] += 15
+        elif key >= 21:
+            dictiTuile[key][0][1] += 5
+            dictiTuile[key][0][0] += 5
+            
+        elif key >= 20:
+            dictiTuile[key][0][1] += 7
+            dictiTuile[key][0][0] += 7
+            
+            
+        elif key >= 19:
+            dictiTuile[key][0][1] -= 5
+            dictiTuile[key][0][0] -= 5
+        
+        elif key >=18:
+            dictiTuile[key][0][1] += 28
+            dictiTuile[key][0][0] += 28
+        
+        elif key >=15:
+            dictiTuile[key][0][1] += 25
+            dictiTuile[key][0][0] += 25
+        
+        
+        elif key >= 13:
+            dictiTuile[key][0][1] += 15
+            dictiTuile[key][0][0] += 15
+        
+        elif key >= 12:
+            dictiTuile[key][0][1] += 5
+            dictiTuile[key][0][0] += 5
+        elif key >= 10:
+            dictiTuile[key][0][1] -= 2
+            dictiTuile[key][0][0] -= 2
         if key >= 5:
             dictiTuile[key][0][1] += 25
             dictiTuile[key][0][0] += 25
