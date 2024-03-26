@@ -111,6 +111,28 @@ try:
         
     dictiTuile[2][0][1] += 10
     dictiTuile[4][0][1] += 15
+    dictiTuile[11][0][1] = 353
+    dictiTuile[12][0][1] = 427
+    dictiTuile[14][0][1] = 565
+    dictiTuile[17][0][1] = 760
+    #dictiTuile[18][0][1] = 215
+    dictiTuile[19][0][1] = 291
+    dictiTuile[20][0][1] = 353
+    dictiTuile[21][0][1] = 432
+    dictiTuile[24][0][1] = 639
+    #dictiTuile[27][0][1] = 215
+    dictiTuile[28][0][1] = 294
+    dictiTuile[30][0][1] = 432
+    dictiTuile[32][0][1] = 565
+    dictiTuile[35][0][1] = 772
+    #dictiTuile[36][0][1] = 210
+    dictiTuile[37][0][1] = 294
+    dictiTuile[40][0][1] = 491
+    dictiTuile[41][0][1] = 560
+    dictiTuile[42][0][1] = 629
+    dictiTuile[43][0][1] = 698
+    dictiTuile[44][0][1] = 772
+  
     print(dictiTuile)
     # les boutons:
     bouton1 = Bouton("bouton1", 30, 30, 100, 50, "clique")
@@ -137,12 +159,12 @@ try:
         # d'abord les entrées utilisateur
         controller.gerer_input()
         # puis la logique du jeu
-        model.update()
-        modelZombie.update()
+        #model.update()
+        #modelZombie.update()
         # puis on affiche
         view.draw()
-        #pygame.draw.line(view.screen, (255,0,0), (dictiTuile[9][0][0], dictiTuile[9][1][0]), (dictiTuile[9][0][1], dictiTuile[9][1][0]), 3)
-        #pygame.draw.line(view.screen, (255,0,0), (dictiTuile[9][0][0], dictiTuile[9][1][0]), (dictiTuile[9][0][0], dictiTuile[9][1][1]), 3)
+        #pygame.draw.line(view.screen, (255,0,0), (dictiTuile[18][0][0], dictiTuile[18][1][0]), (dictiTuile[18][0][1], dictiTuile[18][1][0]), 3)
+        #pygame.draw.line(view.screen, (255,0,0), (dictiTuile[18][0][0], dictiTuile[18][1][0]), (dictiTuile[18][0][0], dictiTuile[18][1][1]), 3)
 
         pygame.display.flip()
         for keys, value in dictiTuile.items():
