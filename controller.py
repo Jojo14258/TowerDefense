@@ -20,12 +20,13 @@ class Controller:
     def gerer_input(self):
 
         souris_x, souris_y = pygame.mouse.get_pos()
+     
 
         for event in pygame.event.get():
 
             ### clavier
             if event.type == pygame.KEYDOWN:
-
+                
                 # fermer le jeux
                 if event.key == pygame.K_ESCAPE:
                     self.model.done = True
@@ -41,7 +42,7 @@ class Controller:
                     self.model.personnage.deplacer("droite")
             ### souris
             elif event.type == pygame.MOUSEBUTTONDOWN:
-
+                print(souris_x, souris_y)
                 for bouton in self.model.boutons:
                     if bouton.est_cible(souris_x, souris_y):
                         if bouton.nom == "bouton1":

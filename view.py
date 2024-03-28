@@ -94,7 +94,7 @@ class ViewPersonnage(pygame.sprite.Sprite):
         Voir vidéo https://www.youtube.com/watch?v=MYaxPa_eZS0
         """
         for i in range(1, len(os.listdir(f"ressources/{str(personnage.nom)}_marche"))):
-                self.image = pygame.image.load(f"ressources/{str(personnage.nom)}_marche/frame-{i}.gif")
+                self.image = pygame.image.load(f"ressources/{str(personnage.nom)}_marche/frame-{i}.gif").convert()
                 self.sprites.append(self.image)    #Initialisation d'un tableau contenant l'ensemble des image d'animation
         self.image = self.sprites[self.actuelle]
         self.image = pygame.transform.scale(self.image, (226, 153))
