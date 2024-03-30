@@ -3,7 +3,7 @@
 ### View
 # Ce module comporte le code pour afficher le jeu
 
-import pygame, os
+import pygame, os, model
 
 # des constantes
 SCREEN_WIDTH = 866
@@ -73,8 +73,7 @@ class ViewPersonnage(pygame.sprite.Sprite):
         self.sprites = []   #séquence d'image pour l'animation
         self.actuelle = 0
         # l'image du personnage
-        
-        print("zombie" in str(personnage.nom))
+     
         if "zombie" in str(personnage.nom):
             self.TabAnimation(personnage)
             
@@ -94,24 +93,26 @@ class ViewPersonnage(pygame.sprite.Sprite):
         Voir vidéo https://www.youtube.com/watch?v=MYaxPa_eZS0
         """
         for i in range(1, len(os.listdir(f"ressources/{str(personnage.nom)}_marche"))):
-                self.image = pygame.image.load(f"ressources/{str(personnage.nom)}_marche/frame-{i}.gif").convert()
+                self.image = pygame.image.load(f"ressources/{str(personnage.nom)}_marche/frame-{i}.gif").convert_alpha()
                 self.sprites.append(self.image)    #Initialisation d'un tableau contenant l'ensemble des image d'animation
         self.image = self.sprites[self.actuelle]
         self.image = pygame.transform.scale(self.image, (226, 153))
         self.rect = self.image.get_rect()
+        self.image.set_colorkey((0,0,0))
         #self.image = pygame.image.load(f"ressources/{str(personnage.nom)}.gif") #si c'est un zombie, on met la version gif
         
     def animer(self, personnage, vitesse=0.0150):
         self.rect.x, self.rect.y = self.personnage.get_position()
-        self.actuelle += vitesse
+        self.actuelle += personnage.vitesse
         if self.actuelle >= len(self.sprites):
             self.actuelle = 0
         self.image = self.sprites[int(self.actuelle)]
         
     def update(self):  
-        self.animer(self.personnage)
+        self.animer(self.personnage, model.vitesse)
 
     def draw(self, screen):
         nouvelle_position = self.personnage.get_position()
-        screen.blit(self.image, nouvelle_position)
+        screen.blit(self.image, ((nouvelle_position[0] - self.image.get_width()/2), nouvelle_position[1] - self.image.get_height()+40))
 
+ 
