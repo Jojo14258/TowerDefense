@@ -9,6 +9,7 @@ import pygame
 STEP_SIZE = 20
 vitesse = 0.04
 
+
 def carteVersMatrice(x, y):
     longueur = 64  #debut = 284 - 220 
     largeur = 81  #235 - 154
@@ -25,6 +26,7 @@ def carteVersMatrice(x, y):
     return dictTuiles
 
 dictiTuile = carteVersMatrice(220,  155) #génération d'une matrice
+dictiTuile = {1: ([220, 284], [74, 155]), 2: ([284, 358], [74, 155]), 3: ([358, 422], [74, 155]), 4: ([422, 501], [74, 155]), 5: ([501, 565], [74, 155]), 6: ([565, 629], [74, 155]), 7: ([629, 693], [74, 155]), 8: ([693, 757], [74, 155]), 9: ([757, 821], [74, 155]), 10: ([218, 282], [155, 236]), 11: ([282, 353], [155, 236]), 12: ([353, 427], [155, 236]), 13: ([427, 491], [155, 236]), 14: ([491, 565], [155, 236]), 15: ([565, 629], [155, 236]), 16: ([629, 693], [155, 236]), 17: ([693, 760], [155, 236]), 18: ([760, 824], [155, 236]), 19: ([215, 291], [236, 317]), 20: ([291, 353], [236, 317]), 21: ([353, 432], [236, 317]), 22: ([432, 496], [236, 317]), 23: ([496, 560], [236, 317]), 24: ([560, 639], [236, 317]), 25: ([639, 703], [236, 317]), 26: ([703, 767], [236, 317]), 27: ([767, 831], [236, 317]), 28: ([215, 294], [317, 398]), 29: ([294, 358], [317, 398]), 30: ([358, 432], [317, 398]), 31: ([432, 496], [317, 398]), 32: ([496, 565], [317, 398]), 33: ([565, 629], [317, 398]), 34: ([629, 693], [317, 398]), 35: ([693, 772], [317, 398]), 36: ([772, 836], [317, 398]), 37: ([210, 294], [398, 479]), 38: ([294, 358], [398, 479]), 39: ([358, 422], [398, 479]), 40: ([422, 491], [398, 479]), 41: ([491, 560], [398, 479]), 42: ([560, 629], [398, 479]), 43: ([629, 698], [398, 479]), 44: ([698, 772], [398, 479]), 45: ([772, 836], [398, 479])}
 #On corrige les imperfections liés aux irrégularités du terrain (voir le commit 04.5 du Github pour la correction manuelle avec le code)
 
 class Model:
@@ -113,18 +115,18 @@ class Personnage:
             
             self.x -= vitesse #vitesse déplacement
             self.set_position((self.x, self.y))
+            
 class Zombie(Personnage):
     """
     Une sous classe enfant de la classe Personnage.
     """
-    def __init__(self, nom, tuile, vitesse):
-       
-        self.tuile = tuile
+    def __init__(self, nom, ligne, vitesse):
+        super().__init__(nom, NPC=True)
+        self.ligne = ligne
         self.nom = nom
         self.vitesse = vitesse
         self.tuilesParcourues = []
-        super().__init__(nom, NPC=True)
-        Zombie.apparaitre(self,self.tuile)
+        Zombie.apparaitre(self,self.ligne)
         
    
             
@@ -134,6 +136,40 @@ class Zombie(Personnage):
         if Ligne_depart in dictiTuile.keys():
             self.x = (dictiTuile[Ligne_depart][0][1])
             self.y = ((dictiTuile[Ligne_depart][1][0]+dictiTuile[Ligne_depart][1][1])//2)
+        
+    
+    def obtenir_ligne(self):
+            nbTuiles = 0
+            for ligne in range(1, 6):
+                nbTuiles += 9
+                for tuile in range(nbTuiles-8, nbTuiles+1):
+                    if self.obtenir_tuile() == None: #cela signifie que le zombie est sorti horizontalement de la matrice
+                        DerniereTuileParcourue = self.tuilesParcourues[-1]
+                        return (DerniereTuileParcourue//9)+1
+                    elif (dictiTuile[tuile][0][0] <= self.x <= dictiTuile[tuile][0][1]) and (dictiTuile[tuile][1][0] <= self.y <= dictiTuile[tuile][1][1]):
+                        return ligne
+        
+    def update(self): #surcharge de la classe précédente 
+        self.x -= self.vitesse #vitesse déplacement
+        self.set_position((self.x, self.y))
+        if self.obtenir_tuile() != None:
+            self.tuilesParcourues.append(self.obtenir_tuile())
+            
+class Plante(Personnage):
+    """
+    Une sous classe plante enfant de la classe Personnage.
+    """
+    def __init__(self, nom, tuile,vitesse):
+        super().__init__(nom, NPC=True)
+        self.tuile = tuile
+        self.nom = nom
+        self.vitesse = vitesse 
+        self.apparaitre(self.tuile)
+        
+
+    def apparaitre(self, tuile):
+        self.x = ((dictiTuile[tuile][0][1]+dictiTuile[tuile][0][0])//2)
+        self.y = ((dictiTuile[tuile][1][0]+dictiTuile[tuile][1][1])//2)
         
     def obtenir_ligne(self):
         nbTuiles = 0
@@ -145,10 +181,6 @@ class Zombie(Personnage):
                     return (DerniereTuileParcourue//9)+1
                 elif (dictiTuile[tuile][0][0] <= self.x <= dictiTuile[tuile][0][1]) and (dictiTuile[tuile][1][0] <= self.y <= dictiTuile[tuile][1][1]):
                     return ligne
-        
-        
+                    
     def update(self): #surcharge de la classe précédente 
-        self.x -= self.vitesse #vitesse déplacement
-        self.set_position((self.x, self.y))
-        if self.obtenir_tuile() != None:
-            self.tuilesParcourues.append(self.obtenir_tuile())
+        pass
