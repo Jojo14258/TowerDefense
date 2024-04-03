@@ -22,11 +22,13 @@ try:
     
     # les boutons:
     bouton1 = Bouton("bouton1", 30, 30, 100, 50, "clique")
+    bouton2 = Bouton("bouton2", 75, 75, 100, 50, "plante")
     model.ajouter_bouton(bouton1)
+    model.ajouter_bouton(bouton2)
 
     # le personnage et son image:
     perso = Personnage(str("perso"),False) #2 attributs, nom et si NPC
-    zombie1 = Zombie("zombie1", 1, 0.67) 
+    zombie1 = Zombie("zombie1", 1, 0.67)  
     zombie2 = Zombie("zombie1", 2, 0.047) 
     zombie3 = Zombie("zombie1", 3, 0.02) 
     peaShooter = Plante("peaShooter", 2, 0.07)

@@ -4,10 +4,10 @@
 # Ce module comporte le code pour gérer l'interaction avec l'utilisateur-rice
 
 import pygame
-
+from model import *
+from view import *
 # des constantes
 texte_bouton = pygame.font.SysFont('Corbel', 30, bold=True)
-
 
 class Controller:
     """
@@ -47,6 +47,11 @@ class Controller:
                     if bouton.est_cible(souris_x, souris_y):
                         if bouton.nom == "bouton1":
                             print("triple monstre")
+                        if bouton.nom == "bouton2":
+                            pass
+
+                                
+            
 
             ### fenetre
             elif event.type == pygame.QUIT:
