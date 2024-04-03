@@ -48,9 +48,7 @@ class View:
 
         # dessiner les boutons
         for b in self.model.boutons:
-            pygame.draw.rect(self.screen,couleur_boutons,[b.x, b.y, b.largeur, b.longueur])
-            if b.text != None:
-                self.screen.blit(b.text, (b.x + 3, b.y + 3))
+            self.screen.blit(b.img, (b.x + 3, b.y + 3))
 
         pygame.display.update()
 
@@ -79,7 +77,7 @@ class ViewPersonnage(pygame.sprite.Sprite):
             
             
         else:
-            self.image = pygame.image.load("ressources/personnage.png") #si c'est le truc controlable du joueur, on met un .Png
+            self.image = pygame.image.load("ressources/personnage.png").convert_alpha() #si c'est le truc controlable du joueur, on met un .Png
             self.image = pygame.transform.scale(self.image, (30, 30))
             self.sprites.append(self.image)
         self.rect = self.image.get_rect()

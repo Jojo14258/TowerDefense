@@ -17,6 +17,13 @@ class Controller:
     def __init__(self, model):
         self.model = model
 
+    def obtenir_tuile(x, y):
+        for keys, values in dictiTuile.items():
+            if (values[0][0] <= x <= values[0][1]) and (values[1][0] <= y <= values[1][1]):
+                return keys 
+        #print("Erreur de code")
+        return None
+    
     def gerer_input(self):
 
         souris_x, souris_y = pygame.mouse.get_pos()
@@ -42,7 +49,7 @@ class Controller:
                     self.model.personnage.deplacer("droite")
             ### souris
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                print(souris_x, souris_y)
+                print(obtenir_tuile(souris_x, souris_y))
                 for bouton in self.model.boutons:
                     if bouton.est_cible(souris_x, souris_y):
                         if bouton.nom == "bouton1":
@@ -63,22 +70,20 @@ class Bouton:
     Classe qui modélise un bouton à cliquer
     """
 
-    def __init__(self, nom, x, y, largeur, longueur, text=None):
+    def __init__(self, nom, x, y, img):
         # on utilise un nom pour différencier les boutons
         self.nom = nom
+        self.img = img
         self.x, self.y = x, y
-        self.largeur = largeur
-        self.longueur = longueur
-        self.text = text
-        if text != None:
-            self.text = texte_bouton.render(text , True , (200,200,200))
 
     def est_cible(self, x, y):
         """
         x et y : la position de la souris
         Sortie : Vrai si la souris est sur le bouton, Faux sinon
         """
-        return x >= self.x and x <= (self.x + self.largeur) and y >= self.y and x <= (self.y + self.longueur)
+        print(self.img.get_rect().collidepoint(x, y))
+        rect = self.img.get_rect()
+        return self.img.get_rect().collidepoint(x, y)
 
 
 

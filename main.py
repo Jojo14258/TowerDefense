@@ -21,10 +21,11 @@ try:
     
     
     # les boutons:
-    bouton1 = Bouton("bouton1", 30, 30, 100, 50, "clique")
-    bouton2 = Bouton("bouton2", 75, 75, 100, 50, "plante")
-    model.ajouter_bouton(bouton1)
+    img = pygame.image.load("./ressources/boutons/Peashooter.png").convert_alpha()
+    #bouton1 = Bouton("bouton1", 30, 30, 100, 50, "clique")
+    bouton2 = Bouton("PeaShooter", 75, 75,  img)
     model.ajouter_bouton(bouton2)
+    #model.ajouter_bouton()
 
     # le personnage et son image:
     perso = Personnage(str("perso"),False) #2 attributs, nom et si NPC
