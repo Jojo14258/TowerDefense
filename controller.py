@@ -51,11 +51,15 @@ class Controller:
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 print(obtenir_tuile(souris_x, souris_y))
                 for bouton in self.model.boutons:
-                    if bouton.est_cible(souris_x, souris_y):
-                        if bouton.nom == "bouton1":
-                            print("triple monstre")
-                        if bouton.nom == "bouton2":
-                            pass
+                    bouton.est_cible(souris_x, souris_y)
+                    if bouton.clique:
+                        print(bouton.nom)
+                        if bouton.nom == "PeaShooter":
+                            peaShooter = Plante("peaShooter",obtenir_tuile(souris_x, souris_y),0.07)
+                            dico_plantes[obtenir_tuile(souris_x, souris_y)] = peaShooter
+                            peaShooter.apparaitre(obtenir_tuile(souris_x, souris_y))
+                            view.add_elem(ViewPersonnage(peaShooter))
+                            
 
                                 
             
@@ -77,7 +81,7 @@ class Bouton:
         self.largeur = img.get_width()
         self.hauteur = img.get_height()
         self.img = pygame.transform.scale(img, (int(self.largeur*scale), int(self.hauteur*scale)))
-        
+        self.clique = False
         
         
         self.x, self.y = x, y
@@ -92,7 +96,11 @@ class Bouton:
         souris_x, souris_y = pygame.mouse.get_pos()
         print(self.img.get_rect().collidepoint(souris_x, souris_y))
         
-        return self.img.get_rect().collidepoint(souris_x, souris_y)
+        if self.img.get_rect().collidepoint(souris_x, souris_y) and self.clique == False:
+            self.clique = True
+        
+        elif self.img.get_rect().collidepoint(souris_x, souris_y) and self.clique:
+            self.clique = False
 
 
 
