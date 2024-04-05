@@ -6,8 +6,10 @@
 import pygame
 from model import *
 from view import *
+
 # des constantes
 texte_bouton = pygame.font.SysFont('Corbel', 30, bold=True)
+
 
 class Controller:
     """
@@ -16,7 +18,7 @@ class Controller:
 
     def __init__(self, model):
         self.model = model
-
+        
     def obtenir_tuile(x, y):
         for keys, values in dictiTuile.items():
             if (values[0][0] <= x <= values[0][1]) and (values[1][0] <= y <= values[1][1]):
@@ -49,17 +51,18 @@ class Controller:
                     self.model.personnage.deplacer("droite")
             ### souris
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                print(obtenir_tuile(souris_x, souris_y))
                 for bouton in self.model.boutons:
                     bouton.est_cible(souris_x, souris_y)
                     if bouton.clique:
-                        print(bouton.nom)
                         if bouton.nom == "PeaShooter":
-                            peaShooter = Plante("peaShooter",obtenir_tuile(souris_x, souris_y),0.07)
-                            dico_plantes[obtenir_tuile(souris_x, souris_y)] = peaShooter
-                            peaShooter.apparaitre(obtenir_tuile(souris_x, souris_y))
-                            view.add_elem(ViewPersonnage(peaShooter))
-                            
+                            tuile = obtenir_tuile(souris_x, souris_y)
+                            if tuile != None:
+                                peaShooter = Plante("peaShooter",tuile ,0.07)
+                                peaShooter.apparaitre(tuile)
+                               
+                                
+                                
+                                
 
                                 
             
@@ -101,7 +104,7 @@ class Bouton:
         
         elif self.img.get_rect().collidepoint(souris_x, souris_y) and self.clique:
             self.clique = False
-
+        
 
 
 

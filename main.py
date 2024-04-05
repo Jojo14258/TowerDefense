@@ -40,9 +40,7 @@ try:
     #modelZombie.persozombie2 = Zombie("zombie1", 2) 
 
     #vue_perso = ViewPersonnage(perso)
-    dico_plantes = {}
-    dico_zombies = {}
-    
+   
     #view.add_elem(vue_perso)
     view.add_elem(ViewPersonnage(zombie1))
     view.add_elem(ViewPersonnage(zombie2))
@@ -52,7 +50,7 @@ try:
     i = 1
    
     ligne = 1
-    print(peaShooter1.x, peaShooter1.y)
+    
     ### Boucle du jeu
     # chaque tour de boucle est un 'pas' dans le jeux
     while not model.done:
@@ -61,6 +59,10 @@ try:
         # puis la logique du jeu
         #model.update()
         #modelZombie.update()
+        if len(PeaShooterActuelles) > NbPlantes:
+           
+            view.add_elem(ViewPersonnage(PeaShooterActuelles[-1])) #Ajout de la dernière plante (Pile)
+            NbPlantes = len(PeaShooterActuelles)
         i += 1
         zombie1.update()
         zombie1.modelPerso.update()
