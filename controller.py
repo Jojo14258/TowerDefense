@@ -54,6 +54,7 @@ class Controller:
                 for bouton in self.model.boutons:
                     bouton.est_cible(souris_x, souris_y)
                     if bouton.clique:
+                        print(bouton.clique)
                         if bouton.nom == "PeaShooter":
                             tuile = obtenir_tuile(souris_x, souris_y)
                             if tuile != None:
@@ -97,7 +98,6 @@ class Bouton:
         """
         
         souris_x, souris_y = pygame.mouse.get_pos()
-        print(self.img.get_rect().collidepoint(souris_x, souris_y))
         
         if self.img.get_rect().collidepoint(souris_x, souris_y) and self.clique == False:
             self.clique = True
