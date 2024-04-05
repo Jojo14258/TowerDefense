@@ -40,7 +40,8 @@ try:
     #modelZombie.persozombie2 = Zombie("zombie1", 2) 
 
     #vue_perso = ViewPersonnage(perso)
-    
+    dico_plantes = {}
+    dico_zombies = {}
     
     #view.add_elem(vue_perso)
     view.add_elem(ViewPersonnage(zombie1))
