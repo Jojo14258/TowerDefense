@@ -23,7 +23,7 @@ try:
     # les boutons:
     img = pygame.image.load("./ressources/boutons/Peashooter.png").convert_alpha()
     #bouton1 = Bouton("bouton1", 30, 30, 100, 50, "clique")
-    bouton2 = Bouton("PeaShooter", 75, 75,  img)
+    bouton2 = Bouton("PeaShooter", 75, 75,  img, 1)
     model.ajouter_bouton(bouton2)
     #model.ajouter_bouton()
 

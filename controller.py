@@ -70,20 +70,29 @@ class Bouton:
     Classe qui modélise un bouton à cliquer
     """
 
-    def __init__(self, nom, x, y, img):
+    def __init__(self, nom, x, y, img, scale):
         # on utilise un nom pour différencier les boutons
+        #https://www.youtube.com/watch?v=G8MYGDf_9ho Vidéo utilisé
         self.nom = nom
-        self.img = img
+        self.largeur = img.get_width()
+        self.hauteur = img.get_height()
+        self.img = pygame.transform.scale(img, (int(self.largeur*scale), int(self.hauteur*scale)))
+        
+        
+        
         self.x, self.y = x, y
-
+        self.rect = self.img.get_rect()
+        #self.rect.topleft = (x, y)
     def est_cible(self, x, y):
         """
         x et y : la position de la souris
         Sortie : Vrai si la souris est sur le bouton, Faux sinon
         """
-        print(self.img.get_rect().collidepoint(x, y))
-        rect = self.img.get_rect()
-        return self.img.get_rect().collidepoint(x, y)
+        
+        souris_x, souris_y = pygame.mouse.get_pos()
+        print(self.img.get_rect().collidepoint(souris_x, souris_y))
+        
+        return self.img.get_rect().collidepoint(souris_x, souris_y)
 
 
 

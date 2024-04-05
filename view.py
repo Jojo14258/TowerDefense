@@ -48,7 +48,7 @@ class View:
 
         # dessiner les boutons
         for b in self.model.boutons:
-            self.screen.blit(b.img, (b.x + 3, b.y + 3))
+            self.screen.blit(b.img, (b.rect.x, b.rect.y))
 
         pygame.display.update()
 
