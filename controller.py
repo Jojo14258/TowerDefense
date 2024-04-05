@@ -54,10 +54,9 @@ class Controller:
                 for bouton in self.model.boutons:
                     bouton.est_cible(souris_x, souris_y)
                     if bouton.clique:
-                        print(bouton.clique)
                         if bouton.nom == "PeaShooter":
                             tuile = obtenir_tuile(souris_x, souris_y)
-                            if tuile != None:
+                            if (tuile != None) and (tuile not in dico_plantes.keys()):
                                 peaShooter = Plante("peaShooter",tuile ,0.07)
                                 peaShooter.apparaitre(tuile)
                                

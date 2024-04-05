@@ -32,8 +32,6 @@ try:
     zombie1 = Zombie("zombie1", 1, 0.67)  
     zombie2 = Zombie("zombie1", 2, 0.047) 
     zombie3 = Zombie("zombie1", 3, 0.02) 
-    peaShooter = Plante("peaShooter", 2, 0.07)
-    peaShooter1 = Plante("peaShooter", 14, 0.07)
     perso.set_position((300, 300))
     model.personnage = perso
     #modelZombie.personnage = zombie1
@@ -45,8 +43,6 @@ try:
     view.add_elem(ViewPersonnage(zombie1))
     view.add_elem(ViewPersonnage(zombie2))
     view.add_elem(ViewPersonnage(zombie3))
-    view.add_elem(ViewPersonnage(peaShooter))
-    view.add_elem(ViewPersonnage(peaShooter1))
     i = 1
    
     ligne = 1
@@ -70,8 +66,6 @@ try:
         zombie2.modelPerso.update()
         zombie3.update()
         zombie3.modelPerso.update()
-        peaShooter.update()
-        peaShooter.modelPerso.update()
         tuile = zombie1.obtenir_tuile()
         if i%1000 == 0:
             

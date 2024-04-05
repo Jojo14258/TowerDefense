@@ -177,10 +177,8 @@ class Plante(Personnage):
         self.tuile = tuile
         self.nom = nom
         self.vitesse = vitesse
-        if tuile not in dico_plantes.keys():
-            self.apparaitre(self.tuile)
-            dico_plantes[tuile] = self
-            PeaShooterActuelles.append(self)
+        dico_plantes[tuile] = self
+        PeaShooterActuelles.append(self)
     def apparaitre(self, tuile):
         self.x = ((dictiTuile[tuile][0][1]+dictiTuile[tuile][0][0])//2)
         self.y = ((dictiTuile[tuile][1][0]+dictiTuile[tuile][1][1])//2)
