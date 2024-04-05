@@ -9,7 +9,9 @@ import pygame
 STEP_SIZE = 20
 vitesse = 0.04
 PeaShooterActuelles = [] #Création d'une pile : La dernière plante arrivée est ajouté au visuelle (voir main)
+Zombies = [] #Création d'une list permettant de dénombrer les objets zombies présents
 NbPlantes = len(PeaShooterActuelles)
+
 class MyDict(dict):
     def __setitem__(self, item, value):
         
@@ -96,14 +98,24 @@ class Personnage:
     def get_position(self):
         return (self.x, self.y)
 
-    def obtenir_tuile(self):
+    def obtenir_tuile(self,):
         for keys, values in dictiTuile.items():
             if (values[0][0] <= self.x <= values[0][1]) and (values[1][0] <= self.y <= values[1][1]):
                 return keys 
         #print("Erreur de code")
         return None
     
-    
+    def obtenir_ligne(self):
+            nbTuiles = 0
+            for ligne in range(1, 6):
+                nbTuiles += 9
+                for tuile in range(nbTuiles-8, nbTuiles+1):
+                    if self.obtenir_tuile() == None: #cela signifie que le zombie est sorti horizontalement de la matrice
+                        DerniereTuileParcourue = self.tuilesParcourues[-1]
+                        return (DerniereTuileParcourue//9)+1
+                    elif (dictiTuile[tuile][0][0] <= self.x <= dictiTuile[tuile][0][1]) and (dictiTuile[tuile][1][0] <= self.y <= dictiTuile[tuile][1][1]):
+                        return ligne
+                    
     def set_position(self, pos):
         self.x, self.y = pos
         
@@ -139,6 +151,8 @@ class Zombie(Personnage):
         self.nom = nom
         self.vitesse = vitesse
         self.tuilesParcourues = []
+        self.tuileActuelle = self.obtenir_tuile()
+        Zombies.append(self)
         Zombie.apparaitre(self,self.ligne)
         
    
@@ -151,16 +165,7 @@ class Zombie(Personnage):
             self.y = ((dictiTuile[Ligne_depart][1][0]+dictiTuile[Ligne_depart][1][1])//2)
         
     
-    def obtenir_ligne(self):
-            nbTuiles = 0
-            for ligne in range(1, 6):
-                nbTuiles += 9
-                for tuile in range(nbTuiles-8, nbTuiles+1):
-                    if self.obtenir_tuile() == None: #cela signifie que le zombie est sorti horizontalement de la matrice
-                        DerniereTuileParcourue = self.tuilesParcourues[-1]
-                        return (DerniereTuileParcourue//9)+1
-                    elif (dictiTuile[tuile][0][0] <= self.x <= dictiTuile[tuile][0][1]) and (dictiTuile[tuile][1][0] <= self.y <= dictiTuile[tuile][1][1]):
-                        return ligne
+    
         
     def update(self): #surcharge de la classe précédente 
         self.x -= self.vitesse #vitesse déplacement
@@ -175,10 +180,13 @@ class Plante(Personnage):
     def __init__(self, nom, tuile,vitesse):
         super().__init__(nom, NPC=True)
         self.tuile = tuile
+        self.ligne = self.obtenir_ligne()
         self.nom = nom
         self.vitesse = vitesse
+        self.tirer = False
         dico_plantes[tuile] = self
         PeaShooterActuelles.append(self)
+       
     def apparaitre(self, tuile):
         self.x = ((dictiTuile[tuile][0][1]+dictiTuile[tuile][0][0])//2)
         self.y = ((dictiTuile[tuile][1][0]+dictiTuile[tuile][1][1])//2)
@@ -188,11 +196,25 @@ class Plante(Personnage):
         for ligne in range(1, 6):
             nbTuiles += 9
             for tuile in range(nbTuiles-8, nbTuiles+1):
-                if self.obtenir_tuile() == None: #cela signifie que le zombie est sorti horizontalement de la matrice
-                    DerniereTuileParcourue = self.tuilesParcourues[-1]
-                    return (DerniereTuileParcourue//9)+1
-                elif (dictiTuile[tuile][0][0] <= self.x <= dictiTuile[tuile][0][1]) and (dictiTuile[tuile][1][0] <= self.y <= dictiTuile[tuile][1][1]):
+                if (dictiTuile[tuile][0][0] <= self.x <= dictiTuile[tuile][0][1]) and (dictiTuile[tuile][1][0] <= self.y <= dictiTuile[tuile][1][1]):
                     return ligne
+
+    def zombie_dans_ligne(self):
+        for zombie in Zombies:
+            #print(self.ligne)
+            if (zombie.tuilesParcourues[-1] >= self.tuile) and (zombie.tuilesParcourues[-1]//9 == self.tuile//9): #Si un zombie se situe à une tuile supérieur/egale à notre plante, alors...
+                return True
+            
+            elif type(zombie.tuilesParcourues[-1]//9) == int:
+                
+                if zombie.tuilesParcourues[-1]//9 == self.ligne:
+                    return True
+        return False
+        
                     
     def update(self): #surcharge de la classe précédente 
-        pass
+        if self.zombie_dans_ligne():
+        
+            self.tirer = True
+        else:
+            self.tirer = False

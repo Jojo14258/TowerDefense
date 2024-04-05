@@ -56,9 +56,11 @@ class Controller:
                     if bouton.clique:
                         if bouton.nom == "PeaShooter":
                             tuile = obtenir_tuile(souris_x, souris_y)
+                            bouton_sauvegarde = bouton
                             if (tuile != None) and (tuile not in dico_plantes.keys()):
-                                peaShooter = Plante("peaShooter",tuile ,0.07)
+                                peaShooter = Plante("peaShooter",tuile ,0.8)
                                 peaShooter.apparaitre(tuile)
+                                
                                
                                 
                                 
@@ -89,6 +91,7 @@ class Bouton:
         
         self.x, self.y = x, y
         self.rect = self.img.get_rect()
+        pygame.draw.rect(self.img, (0,0,0), [0, 0, self.rect.width, self.rect.height], 2)
         #self.rect.topleft = (x, y)
     def est_cible(self, x, y):
         """
@@ -100,10 +103,13 @@ class Bouton:
         
         if self.img.get_rect().collidepoint(souris_x, souris_y) and self.clique == False:
             self.clique = True
+            pygame.draw.rect(self.img, (255,0,0), [0, 0, self.rect.width, self.rect.height], 2)
+
         
         elif self.img.get_rect().collidepoint(souris_x, souris_y) and self.clique:
             self.clique = False
-        
+            pygame.draw.rect(self.img, (0,0,0), [0, 0, self.rect.width, self.rect.height], 2)
+
 
 
 

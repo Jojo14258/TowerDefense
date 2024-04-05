@@ -68,13 +68,15 @@ class ViewPersonnage(pygame.sprite.Sprite):
 
         # les attributs de la classe
         self.personnage = personnage
-        self.sprites = []   #séquence d'image pour l'animation
-        self.actuelle = 0
+        self.spritesMarche = []   #séquence d'image pour l'animation basique de toute entité
+        self.spritesTir = []  #séquence d'image pour l'animation de tir des plantes
+        self.actuelle = 0 
         # l'image du personnage
      
-        if ("zombie" in str(personnage.nom)) or ("peaShooter" in str(personnage.nom)):
-            self.TabAnimation(personnage)
-            
+        if "zombie" in str(personnage.nom):
+            self.TabAnimationZombie(personnage)
+        elif ("peaShooter" in str(personnage.nom)):
+            self.TabAnimationPlante(personnage)
             
         else:
             self.image = pygame.image.load("ressources/personnage.png").convert_alpha() #si c'est le truc controlable du joueur, on met un .Png
@@ -83,7 +85,7 @@ class ViewPersonnage(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = self.personnage.get_position()
     
-    def TabAnimation(self, personnage):
+    def TabAnimationZombie(self, personnage):
         """
         personnage : - l'objet de classe personnage
         Génère un tableau d'animation à dérouler. L'animation se fait en fonction de la valeur dans l'attribut
@@ -95,10 +97,31 @@ class ViewPersonnage(pygame.sprite.Sprite):
                 self.image = pygame.image.load(f"ressources/{str(personnage.nom)}_marche/frame-{i}.gif").convert_alpha()
                 if "zombie" in str(self.personnage.nom):
                     self.image = pygame.transform.scale(self.image, (226, 153))
-                elif "pea" in self.personnage.nom:
+                self.spritesMarche.append(self.image)    #Initialisation d'un tableau contenant l'ensemble des image d'animation
+        self.image = self.spritesMarche[self.actuelle]
+        
+        self.rect = self.image.get_rect()
+        self.image.set_colorkey((0,0,0))
+        #self.image = pygame.image.load(f"ressources/{str(personnage.nom)}.gif") #si c'est un zombie, on met la version gif
+        
+    def TabAnimationPlante(self, personnage):
+        """
+        personnage : - l'objet de classe personnage
+        Génère un tableau d'animation à dérouler. L'animation se fait en fonction de la valeur dans l'attribut
+        personnage.nom
+        Voir vidéo https://www.youtube.com/watch?v=MYaxPa_eZS0
+        """
+        for i in range(1, len(os.listdir(f"ressources/{str(personnage.nom)}_marche"))):
+                
+                self.image = pygame.image.load(f"ressources/{str(personnage.nom)}_marche/frame-{i}.gif").convert_alpha()
+                if "pea" in self.personnage.nom:
                     self.image = pygame.transform.scale(self.image, (185//2.7, 157//2.7))
-                self.sprites.append(self.image)    #Initialisation d'un tableau contenant l'ensemble des image d'animation
-        self.image = self.sprites[self.actuelle]
+                self.spritesMarche.append(self.image)    #Initialisation d'un tableau contenant l'ensemble des image d'animation basique
+        for i in range(1, len(os.listdir(f"ressources/{str(personnage.nom)}_tir"))):
+                self.image = pygame.image.load(f"ressources/{str(personnage.nom)}_tir/frame-{i}.gif").convert_alpha()
+                self.image = pygame.transform.scale(self.image, (185//2.7, 157//2.7))
+                self.spritesTir.append(self.image)    #Initialisation d'un tableau contenant l'ensemble des image d'animation de tir
+        self.image = self.spritesMarche[self.actuelle]
         
         self.rect = self.image.get_rect()
         self.image.set_colorkey((0,0,0))
@@ -107,9 +130,20 @@ class ViewPersonnage(pygame.sprite.Sprite):
     def animer(self, personnage, vitesse=0.0150):
         self.rect.x, self.rect.y = self.personnage.get_position()
         self.actuelle += personnage.vitesse
-        if self.actuelle >= len(self.sprites):
+        nombre_image = len(self.spritesMarche)
+        if "pea" in personnage.nom:
+            if personnage.tirer == False:
+                nombre_image = len(self.spritesTir)
+        
+        if self.actuelle >= nombre_image:
             self.actuelle = 0
-        self.image = self.sprites[int(self.actuelle)]
+        if "zombie" in personnage.nom:
+            self.image = self.spritesMarche[int(self.actuelle)]
+        if "pea" in personnage.nom:
+            if personnage.tirer == False:
+                self.image = self.spritesMarche[int(self.actuelle)]
+            else:
+                self.image = self.spritesTir[int(self.actuelle)]
         
     def update(self):  
         if ("zombie" in str(self.personnage.nom)):

@@ -23,15 +23,15 @@ try:
     # les boutons:
     img = pygame.image.load("./ressources/boutons/Peashooter.png").convert_alpha()
     #bouton1 = Bouton("bouton1", 30, 30, 100, 50, "clique")
-    bouton2 = Bouton("PeaShooter", 75, 75,  img, 1)
-    model.ajouter_bouton(bouton2)
+    PeaShooterBouton = Bouton("PeaShooter", 75, 75,  img, 1)
+    model.ajouter_bouton(PeaShooterBouton)
     #model.ajouter_bouton()
 
     # le personnage et son image:
     perso = Personnage(str("perso"),False) #2 attributs, nom et si NPC
-    zombie1 = Zombie("zombie1", 1, 0.67)  
-    zombie2 = Zombie("zombie1", 2, 0.047) 
-    zombie3 = Zombie("zombie1", 3, 0.02) 
+    zombie1 = Zombie("zombie1", 1, 0.04)  
+    zombie2 = Zombie("zombie1", 2, 0.67) 
+    zombie3 = Zombie("zombie1", 3, 0.67) 
     perso.set_position((300, 300))
     model.personnage = perso
     #modelZombie.personnage = zombie1
@@ -46,26 +46,22 @@ try:
     i = 1
    
     ligne = 1
-    
+    clock = pygame.time.Clock()
     ### Boucle du jeu
     # chaque tour de boucle est un 'pas' dans le jeux
     while not model.done:
+        clock.tick(60)  #Le jeu est fait pour être joué à 60 FPS
         # d'abord les entrées utilisateur
         controller.gerer_input()
         # puis la logique du jeu
-        #model.update()
-        #modelZombie.update()
-        if len(PeaShooterActuelles) > NbPlantes:
+        if len(PeaShooterActuelles) > NbPlantes: #Si une plante a été ajoutée...
            
             view.add_elem(ViewPersonnage(PeaShooterActuelles[-1])) #Ajout de la dernière plante (Pile)
-            NbPlantes = len(PeaShooterActuelles)
+            NbPlantes = len(PeaShooterActuelles) #on réajuste le total
         i += 1
-        zombie1.update()
-        zombie1.modelPerso.update()
-        zombie2.update()
-        zombie2.modelPerso.update()
-        zombie3.update()
-        zombie3.modelPerso.update()
+        for element in view.elems:
+            element.personnage.update()
+            element.personnage.modelPerso.update()
         tuile = zombie1.obtenir_tuile()
         if i%1000 == 0:
             
@@ -84,29 +80,8 @@ try:
                     zombie3.apparaitre(1)
                 else:
                     zombie3.apparaitre(zombie3.obtenir_ligne()+1)
-            
-       # if tuile != zombie1.obtenir_tuile:
-        #    print(tuile)
-       #     tuile = zombie1.obtenir_tuile
-            #print(zombie1.get_position())
-            #print(i)
-            
-            
-           
-            
-        
-        zombie1.obtenir_tuile()
-        # puis on affiche
         view.draw()
-        #pygame.draw.line(view.screen, (255,0,0), (dictiTuile[12][0][0], dictiTuile[12][1][0]), (dictiTuile[12][0][1], dictiTuile[12][1][0]), 3)
-        #pygame.draw.line(view.screen, (255,0,0), (dictiTuile[12][0][0], dictiTuile[12][1][0]), (dictiTuile[12][0][0], dictiTuile[12][1][1]), 3)
-
         pygame.display.flip()
-       # for keys, value in dictiTuile.items():
-        #    pygame.draw.line(view.screen, (255,0,0), (value[0][0], value[1][0]), (value[0][0], value[1][1]), 3)
-         #   pygame.draw.line(view.screen, (255,0,0), (value[0][0], value[1][0]), (value[0][1], value[1][0]), 3)
-            
-          #  pygame.display.flip()
 
 except Exception as e:
     pygame.quit()
