@@ -153,9 +153,11 @@ class Zombie(Personnage):
         self.tuilesParcourues = []
         self.tuileActuelle = self.obtenir_tuile()
         Zombies.append(self)
+        self.pv = 200
+        self.degats = 100
+        self.recharge = 2
         Zombie.apparaitre(self,self.ligne)
         
-   
             
     def apparaitre(self, ligne):
         Ligne_depart = 9
@@ -186,6 +188,9 @@ class Plante(Personnage):
         self.tirer = False
         dico_plantes[tuile] = self
         PeaShooterActuelles.append(self)
+        self.pv = 600
+        self.degats = 20
+        self.recharge = 5
        
     def apparaitre(self, tuile):
         self.x = ((dictiTuile[tuile][0][1]+dictiTuile[tuile][0][0])//2)
@@ -198,7 +203,9 @@ class Plante(Personnage):
             for tuile in range(nbTuiles-8, nbTuiles+1):
                 if (dictiTuile[tuile][0][0] <= self.x <= dictiTuile[tuile][0][1]) and (dictiTuile[tuile][1][0] <= self.y <= dictiTuile[tuile][1][1]):
                     return ligne
-
+    def tirer(self):
+        projectile = Projectile()
+        
     def zombie_dans_ligne(self):
         for zombie in Zombies:
             #print(self.ligne)
@@ -218,3 +225,10 @@ class Plante(Personnage):
             self.tirer = True
         else:
             self.tirer = False
+
+class Projectile(pygame.sprite.Sprite):
+    def __init__(self, joueur):
+        super().__init__()
+        self.vitesse = 1
+        self.image = pygame.image.load("assets/Pea.webp")
+        self.rect = self.image.get_rect()
