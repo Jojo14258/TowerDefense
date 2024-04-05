@@ -198,22 +198,22 @@ class Plante(Personnage):
         
     def obtenir_ligne(self):
         nbTuiles = 0
+        nbTotal = 0
         for ligne in range(1, 6):
             nbTuiles += 9
             for tuile in range(nbTuiles-8, nbTuiles+1):
-                if (dictiTuile[tuile][0][0] <= self.x <= dictiTuile[tuile][0][1]) and (dictiTuile[tuile][1][0] <= self.y <= dictiTuile[tuile][1][1]):
+                nbTotal += 1
+                if nbTotal == self.tuile:
                     return ligne
+                
     def tirer(self):
         projectile = Projectile()
         
     def zombie_dans_ligne(self):
         for zombie in Zombies:
-            #print(self.ligne)
             if (zombie.tuilesParcourues[-1] >= self.tuile) and (zombie.tuilesParcourues[-1]//9 == self.tuile//9): #Si un zombie se situe à une tuile supérieur/egale à notre plante, alors...
                 return True
-            
-            elif type(zombie.tuilesParcourues[-1]//9) == int:
-                
+            elif (zombie.tuilesParcourues[-1]%9) == 0:
                 if zombie.tuilesParcourues[-1]//9 == self.ligne:
                     return True
         return False

@@ -29,7 +29,7 @@ try:
 
     # le personnage et son image:
     perso = Personnage(str("perso"),False) #2 attributs, nom et si NPC
-    zombie1 = Zombie("zombie1", 1, 0.04)  
+    zombie1 = Zombie("zombie1", 1, 0.20)  
     zombie2 = Zombie("zombie1", 2, 0.67) 
     zombie3 = Zombie("zombie1", 3, 0.67) 
     perso.set_position((300, 300))
