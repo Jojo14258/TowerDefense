@@ -150,7 +150,7 @@ class Zombie(Personnage):
         self.ligne = ligne
         self.nom = nom
         self.vitesse = vitesse
-        self.vitesse_marche = vitesse
+        self.vitesse_marche, self.vitesse_sauvegarde = vitesse, vitesse  #la vitesse du zombie tend à varier, on garde donc en mémoire une variable de sauvegarde
         self.tuilesParcourues = []
         self.tuileActuelle = self.obtenir_tuile()
         self.pv = pv
@@ -189,10 +189,12 @@ class Zombie(Personnage):
         plante.pv -= self.degats
         
     def update(self): #surcharge de la classe précédente 
+        
         self.x -= self.vitesse_marche #vitesse déplacement
         self.set_position((self.x, self.y))
         clock = pygame.time.Clock()
         self.tempsPasseDepuisDerniereAction += pygame.time.get_ticks()
+        self.vitesse_marche = self.vitesse_sauvegarde
         if self.obtenir_tuile() != None:
             self.tuilesParcourues.append(self.obtenir_tuile())
         if self.detecterPlante():
