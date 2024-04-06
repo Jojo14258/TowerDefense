@@ -219,11 +219,14 @@ class Plante(Personnage):
         self.vitesse = vitesse
         self.tirer = False
         self.pv = pv
+        self.dernier_tir = pygame.time.get_ticks()
+        self.interval_tir = 5000
         self.degats = degats
         self.recharge = recharge
         self.collider = None #valeur assigné dans le viewPersonnage
         dico_plantes[tuile] = self
         PeaShooterActuelles.append(self)
+        self.all_projectiles = pygame.sprite.Group()
         
     def apparaitre(self, tuile):
         self.x = ((dictiTuile[tuile][0][1]+dictiTuile[tuile][0][0])//2)
@@ -244,6 +247,8 @@ class Plante(Personnage):
                 
     def tirer(self):
         projectile = Projectile()
+        self.all_projectiles.add(projectile)
+        
     
     def Mourir(self):
         """
@@ -281,6 +286,11 @@ class Plante(Personnage):
                 self.Mourir()
             elif self.est_presentZombie():
                 self.tirer = True
+                now = pygame.time.get_ticks()  # Temps actuel
+                if now - self.dernier_tir >= self.interval_tir:
+                    if self.pv > 0 and self.est_presentZombie():
+                        self.tirer()
+                        self.dernier_tir = now
             else:
                 self.tirer = False
 
@@ -290,3 +300,4 @@ class Projectile(pygame.sprite.Sprite):
         self.vitesse = 1
         self.image = pygame.image.load("assets/Pea.webp")
         self.rect = self.image.get_rect()
+        
