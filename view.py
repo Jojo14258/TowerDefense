@@ -69,22 +69,21 @@ class ViewPersonnage(pygame.sprite.Sprite):
         # les attributs de la classe
         self.personnage = personnage
         self.spritesMarche = []   #séquence d'image pour l'animation basique de toute entité
+        self.spritesManger = []  #séquence d'image pour l'animation manger des zombies
         self.spritesTir = []  #séquence d'image pour l'animation de tir des plantes
         self.actuelle = 0 
         # l'image du personnage
      
-        if "zombie" in str(personnage.nom):
+        if ("zombie" in str(personnage.nom)):
             self.TabAnimationZombie(personnage)
         elif ("peaShooter" in str(personnage.nom)):
             self.TabAnimationPlante(personnage)
-            
-        else:
-            self.image = pygame.image.load("ressources/personnage.png").convert_alpha() #si c'est le truc controlable du joueur, on met un .Png
-            self.image = pygame.transform.scale(self.image, (30, 30))
-            self.sprites.append(self.image)
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = self.personnage.get_position()
-    
+        self.rect.topleft = (personnage.x, personnage.y)
+        self.personnage.collider = self.rect
+        self.image.set_colorkey((0,0,0))
+        
     def TabAnimationZombie(self, personnage):
         """
         personnage : - l'objet de classe personnage
@@ -93,16 +92,20 @@ class ViewPersonnage(pygame.sprite.Sprite):
         Voir vidéo https://www.youtube.com/watch?v=MYaxPa_eZS0
         """
         for i in range(1, len(os.listdir(f"ressources/{str(personnage.nom)}_marche"))):
-                
-                self.image = pygame.image.load(f"ressources/{str(personnage.nom)}_marche/frame-{i}.gif").convert_alpha()
-                if "zombie" in str(self.personnage.nom):
-                    self.image = pygame.transform.scale(self.image, (226, 153))
-                self.spritesMarche.append(self.image)    #Initialisation d'un tableau contenant l'ensemble des image d'animation
+            self.image = pygame.image.load(f"ressources/{str(personnage.nom)}_marche/frame-{i}.gif").convert_alpha()
+            self.image = pygame.transform.scale(self.image, (226//1.2, 153//1.2))
+            self.spritesMarche.append(self.image)    #Initialisation d'un tableau contenant l'ensemble des image d'animation
+            
+        for i in range(1, len(os.listdir(f"ressources/{str(personnage.nom)}_manger"))):
+            self.image = pygame.image.load(f"ressources/{str(personnage.nom)}_manger/frame-{i}.gif").convert_alpha()
+            self.image = pygame.transform.scale(self.image, (226//1.2, 153//1.2))
+            self.spritesManger.append(self.image) 
+        
         self.image = self.spritesMarche[self.actuelle]
         
-        self.rect = self.image.get_rect()
-        self.image.set_colorkey((0,0,0))
+        
         #self.image = pygame.image.load(f"ressources/{str(personnage.nom)}.gif") #si c'est un zombie, on met la version gif
+        
         
     def TabAnimationPlante(self, personnage):
         """
@@ -123,39 +126,46 @@ class ViewPersonnage(pygame.sprite.Sprite):
                 self.spritesTir.append(self.image)    #Initialisation d'un tableau contenant l'ensemble des image d'animation de tir
         self.image = self.spritesMarche[self.actuelle]
         
-        self.rect = self.image.get_rect()
-        self.image.set_colorkey((0,0,0))
         #self.image = pygame.image.load(f"ressources/{str(personnage.nom)}.gif") #si c'est un zombie, on met la version gif
         
     def animer(self, personnage, vitesse=0.0150):
-        self.rect.x, self.rect.y = self.personnage.get_position()
-        self.actuelle += personnage.vitesse
-        nombre_image = len(self.spritesMarche)
-        if "pea" in personnage.nom:
-            if personnage.tirer == False:
-                nombre_image = len(self.spritesTir)
-        
-        if self.actuelle >= nombre_image:
-            self.actuelle = 0
-        if "zombie" in personnage.nom:
-            self.image = self.spritesMarche[int(self.actuelle)]
-        if "pea" in personnage.nom:
-            if personnage.tirer == False:
-                self.image = self.spritesMarche[int(self.actuelle)]
-            else:
-                self.image = self.spritesTir[int(self.actuelle)]
-        
+        if not(self.personnage.Est_mort):
+            self.rect.x, self.rect.y = self.personnage.get_position()
+            self.actuelle += personnage.vitesse
+            nombre_image = len(self.spritesMarche)
+            if "pea" in personnage.nom:
+                if personnage.tirer:
+                    nombre_image = len(self.spritesTir)
+            if "zombie" in personnage.nom:
+                if personnage.manger:
+                    nombre_image = len(self.spritesManger)
+            if self.actuelle >= nombre_image:
+                self.actuelle = 0
+            if "zombie" in personnage.nom:
+                if personnage.manger:
+                    self.image = self.spritesManger[int(self.actuelle)]
+                else:
+                    self.image = self.spritesMarche[int(self.actuelle)]
+            if "pea" in personnage.nom:
+                if personnage.tirer:
+                    self.image = self.spritesTir[int(self.actuelle)]
+                else:
+                    self.image = self.spritesMarche[int(self.actuelle)]
+        else:
+            self.image = None 
+            
     def update(self):  
         if ("zombie" in str(self.personnage.nom)):
-            self.animer(self.personnage, model.vitesse)
+            self.animer(self.personnage, self.personnage.vitesse)
         else: #il s'agit d'une plante
             self.animer(self.personnage)
 
     def draw(self, screen):
-        nouvelle_position = self.personnage.get_position()
-        if "zombie" in str(self.personnage.nom):
-            screen.blit(self.image, ((nouvelle_position[0] - self.image.get_width()/2), nouvelle_position[1] - self.image.get_height()+40))
-        elif "pea" in str(self.personnage.nom):
-            screen.blit(self.image, ((nouvelle_position[0] - self.image.get_width()/2.5), nouvelle_position[1] - self.image.get_height()+30))
+        if not(self.personnage.Est_mort):
+            nouvelle_position = self.personnage.get_position()
+            if "zombie" in str(self.personnage.nom):
+                screen.blit(self.image, ((nouvelle_position[0] - self.image.get_width()/2), nouvelle_position[1] - self.image.get_height()+40))
+            elif "pea" in str(self.personnage.nom):
+                screen.blit(self.image, ((nouvelle_position[0] - self.image.get_width()/2.5), nouvelle_position[1] - self.image.get_height()+30))
 
  

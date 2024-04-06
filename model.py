@@ -11,7 +11,8 @@ vitesse = 0.04
 PeaShooterActuelles = [] #Création d'une pile : La dernière plante arrivée est ajouté au visuelle (voir main)
 Zombies = [] #Création d'une list permettant de dénombrer les objets zombies présents
 NbPlantes = len(PeaShooterActuelles)
-
+Plantes_groupe = pygame.sprite.Group()
+Zombies_groupe = pygame.sprite.Group()
 class MyDict(dict):
     def __setitem__(self, item, value):
         
@@ -54,7 +55,6 @@ class Model:
         # on initialise les attributs necessaires
         self.personnage = None
         self.boutons = []
-
         # un booleen qui dit si le jeu est fini
         self.done = False
 
@@ -94,7 +94,7 @@ class Personnage:
         self.NPC = NPC
         self.modelPerso = Model() #initialisation graphique
         self.modelPerso.personnage = self
-
+        self.Est_mort = False
     def get_position(self):
         return (self.x, self.y)
 
@@ -145,19 +145,24 @@ class Zombie(Personnage):
     """
     Une sous classe enfant de la classe Personnage.
     """
-    def __init__(self, nom, ligne, vitesse):
+    def __init__(self, nom, ligne, vitesse, pv, degats):
         super().__init__(nom, NPC=True)
         self.ligne = ligne
         self.nom = nom
         self.vitesse = vitesse
+        self.vitesse_marche = vitesse
         self.tuilesParcourues = []
         self.tuileActuelle = self.obtenir_tuile()
-        Zombies.append(self)
-        self.pv = 200
-        self.degats = 100
+        self.pv = pv
+        self.degats = degats
         self.recharge = 2
+        self.collider = None #valeur assigné dans le viewPersonnage
+        self.manger = False
+        self.tempsPasseDepuisDerniereAction = 0
+        self.Est_mort = False
+        Zombies.append(self)
         Zombie.apparaitre(self,self.ligne)
-        
+      
             
     def apparaitre(self, ligne):
         Ligne_depart = 9
@@ -166,37 +171,66 @@ class Zombie(Personnage):
             self.x = (dictiTuile[Ligne_depart][0][1])
             self.y = ((dictiTuile[Ligne_depart][1][0]+dictiTuile[Ligne_depart][1][1])//2)
         
-    
-    
+    def detecterPlante(self):
+            if self.collider != None:
+                tuile = self.tuilesParcourues[-1]
+                if tuile in dico_plantes.keys():
+                    collisionPlante = dico_plantes[tuile].collider
+                    if self.collider.colliderect(collisionPlante):
+                        return True
+                return False
+            
+    def endommagerPlante(self):
+        """
+        Fonction qui s'occupe de réduire la vie de de plante lorsqu'elle celle-ci entre en collision avec un zombie
+        Modifie par effet de bord l'attribut vie de la plante.
+        """
+        plante = dico_plantes[self.tuilesParcourues[-1]]
+        plante.pv -= self.degats
         
     def update(self): #surcharge de la classe précédente 
-        self.x -= self.vitesse #vitesse déplacement
+        self.x -= self.vitesse_marche #vitesse déplacement
         self.set_position((self.x, self.y))
+        clock = pygame.time.Clock()
+        self.tempsPasseDepuisDerniereAction += pygame.time.get_ticks()
         if self.obtenir_tuile() != None:
             self.tuilesParcourues.append(self.obtenir_tuile())
-            
+        if self.detecterPlante():
+            self.vitesse_marche = 0
+            self.manger = True
+          #  print(self.tempsPasseDepuisDerniereAction%1000)
+            if self.tempsPasseDepuisDerniereAction >= 1500000: #si 3 secondes ont passé...
+                self.endommagerPlante()
+                self.tempsPasseDepuisDerniereAction = 0
+        if not(self.detecterPlante()):
+            self.manger = False
 class Plante(Personnage):
     """
     Une sous classe plante enfant de la classe Personnage.
     """
-    def __init__(self, nom, tuile,vitesse):
+    def __init__(self, nom, tuile,vitesse, pv, degats, recharge):
         super().__init__(nom, NPC=True)
+       
         self.tuile = tuile
         self.ligne = self.obtenir_ligne()
         self.nom = nom
         self.vitesse = vitesse
         self.tirer = False
+        self.pv = pv
+        self.degats = degats
+        self.recharge = recharge
+        self.collider = None #valeur assigné dans le viewPersonnage
         dico_plantes[tuile] = self
         PeaShooterActuelles.append(self)
-        self.pv = 600
-        self.degats = 20
-        self.recharge = 5
-       
+        
     def apparaitre(self, tuile):
         self.x = ((dictiTuile[tuile][0][1]+dictiTuile[tuile][0][0])//2)
         self.y = ((dictiTuile[tuile][1][0]+dictiTuile[tuile][1][1])//2)
         
     def obtenir_ligne(self):
+        """
+        Sortie - int : Retourne le numéro de la ligne sur laquelle est située la plante (en partant de 1).
+        """
         nbTuiles = 0
         nbTotal = 0
         for ligne in range(1, 6):
@@ -208,23 +242,45 @@ class Plante(Personnage):
                 
     def tirer(self):
         projectile = Projectile()
+    
+    def Mourir(self):
+        """
+        Supprime toute les références à l'instance afin de supprimer l'instance complètement.
+        """
+       # PeaShooterActuelles.remove(self)
+        del dico_plantes[self.tuile] #on supprime toute les références à l'objet
+        self.Est_mort = True
+
         
-    def zombie_dans_ligne(self):
+        
+    def est_presentZombie(self):
+        """
+        Sortie - bool : Retourne True si un zombie se situe devant la plante. False si aucun zombie
+        n'est situé devant (cas où il n'y a aucun zombie ou bien les zombies sont derrière)
+        """
         for zombie in Zombies:
             if (zombie.tuilesParcourues[-1] >= self.tuile) and (zombie.tuilesParcourues[-1]//9 == self.tuile//9): #Si un zombie se situe à une tuile supérieur/egale à notre plante, alors...
-                return True
-            elif (zombie.tuilesParcourues[-1]%9) == 0:
+                
+                if(zombie.x) >= 219: #On vérifie que le zombie ne soit pas en dehors de la map
+                    if zombie.tuilesParcourues[-1]//9+1 == self.ligne: #Zombie sur la même ligne que la plante ? 
+                        return True
+            #    if zombie.tuilesParcourues[-1]//9 == self.ligne: #cette ligne permet de fix un petit bug (cas ou zombie 1ere tuile et plante derniere tuile ligne)
+                    
+            elif (zombie.tuilesParcourues[-1]%9) == 0: #cas où le zombie est sur la dernière tuile
                 if zombie.tuilesParcourues[-1]//9 == self.ligne:
                     return True
         return False
         
                     
     def update(self): #surcharge de la classe précédente 
-        if self.zombie_dans_ligne():
-        
-            self.tirer = True
-        else:
-            self.tirer = False
+        if not(self.Est_mort):
+            if self.pv <= 0:
+                
+                self.Mourir()
+            elif self.est_presentZombie():
+                self.tirer = True
+            else:
+                self.tirer = False
 
 class Projectile(pygame.sprite.Sprite):
     def __init__(self, joueur):
