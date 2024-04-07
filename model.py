@@ -9,7 +9,7 @@ import pygame, view
 STEP_SIZE = 20
 vitesse = 0.04
 PeaShooterActuelles = [] #Création d'une pile : La dernière plante arrivée est ajouté au visuelle (voir main)
-Zombies = [] #Création d'une list permettant de dénombrer les objets zombies présents
+#Zombies = [] #Création d'une list permettant de dénombrer les objets zombies présents
 NbPlantes = len(PeaShooterActuelles)
 Plantes_groupe = pygame.sprite.Group()
 Zombies_groupe = pygame.sprite.Group()
@@ -160,7 +160,6 @@ class Zombie(Personnage):
         self.manger = False
         self.time = 0
         dico_zombies[self.tuilesParcourues[-1]][self] = self
-        Zombies.append(self)
         Zombie.apparaitre(self,self.ligne)
       
     
@@ -268,14 +267,15 @@ class Plante(Personnage):
         Sortie - bool : Retourne True si un zombie se situe devant la plante. False si aucun zombie
         n'est situé devant (cas où il n'y a aucun zombie ou bien les zombies sont derrière)
         """
-        for zombie in Zombies:
-            if (zombie.tuilesParcourues[-1] >= self.tuile) and (zombie.tuilesParcourues[-1]//9 == self.tuile//9): #Si un zombie se situe à une tuile supérieur/egale à notre plante, alors...
-                if(zombie.x) >= 219: #On vérifie que le zombie ne soit pas en dehors de la map
-                    if zombie.tuilesParcourues[-1]//9+1 == self.ligne: #Zombie sur la même ligne que la plante ? 
+        for tuiles in dico_zombies.values():
+            for zombie in tuiles.keys():
+                if (zombie.tuilesParcourues[-1] >= self.tuile) and (zombie.tuilesParcourues[-1]//9 == self.tuile//9): #Si un zombie se situe à une tuile supérieur/egale à notre plante, alors...
+                    if(zombie.x) >= 219: #On vérifie que le zombie ne soit pas en dehors de la map
+                        if zombie.tuilesParcourues[-1]//9+1 == self.ligne: #Zombie sur la même ligne que la plante ? 
+                            return True
+                elif (zombie.tuilesParcourues[-1]%9) == 0: #cas où le zombie est sur la dernière tuile
+                    if zombie.tuilesParcourues[-1]//9 == self.ligne:
                         return True
-            elif (zombie.tuilesParcourues[-1]%9) == 0: #cas où le zombie est sur la dernière tuile
-                if zombie.tuilesParcourues[-1]//9 == self.ligne:
-                    return True
         return False
         
                     
@@ -319,7 +319,6 @@ class Pea(Personnage):
         for mort_vivants in dico_zombies[tuile].keys():      
             if self.collider.colliderect(mort_vivants.collider) and not(self.Est_mort):
                 mort_vivants.pv -= self.degats
-                print(mort_vivants.pv)
                 self.Est_mort = True
                 
     def apparaitre(self, tuile):
