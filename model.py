@@ -8,7 +8,7 @@ import pygame, view
 # des constantes
 STEP_SIZE = 20
 vitesse = 0.04
-PeaShooterActuelles = [] #Création d'une pile : La dernière PeaShooter arrivée est ajouté au visuelle (voir main)
+PeaShooterActuelles = [] #Création d'une pile : Le dernier PeaShooter arrivé est ajouté au visuelle (voir main)
 #Zombies = [] #Création d'une list permettant de dénombrer les objets zombies présents
 NbPlantes = len(PeaShooterActuelles)
 Plantes_groupe = pygame.sprite.Group()
@@ -185,8 +185,8 @@ class Zombie(Personnage):
         
     def endommagerPlante(self):
         """
-        Fonction qui s'occupe de réduire la vie de de PeaShooter lorsqu'elle celle-ci entre en collision avec un zombie
-        Modifie par effet de bord l'attribut vie de la PeaShooter.
+        Fonction qui s'occupe de réduire la vie d'une plante lorsqu'elle celle-ci entre en collision avec un zombie
+        Modifie par effet de bord l'attribut vie de la plante.
         """
         PeaShooter = dico_plantes[self.tuilesParcourues[-1]]
         PeaShooter.pv -= self.degats
@@ -271,7 +271,7 @@ class PeaShooter(Personnage):
             for zombie in tuiles.keys():
                 if (zombie.tuilesParcourues[-1] >= self.tuile) and (zombie.tuilesParcourues[-1]//9 == self.tuile//9): #Si un zombie se situe à une tuile supérieur/egale à notre PeaShooter, alors...
                     if(zombie.x) >= 219: #On vérifie que le zombie ne soit pas en dehors de la map
-                        if zombie.tuilesParcourues[-1]//9+1 == self.ligne: #Zombie sur la même ligne que la PeaShooter ? 
+                        if zombie.tuilesParcourues[-1]//9+1 == self.ligne: #Zombie sur la même ligne que le PeaShooter ? 
                             return True
                 elif (zombie.tuilesParcourues[-1]%9) == 0: #cas où le zombie est sur la dernière tuile
                     if zombie.tuilesParcourues[-1]//9 == self.ligne:
