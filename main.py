@@ -19,9 +19,8 @@ try:
     
     
     
-    
     # les boutons:
-    img = pygame.image.load("./ressources/boutons/Peashooter.png").convert_alpha()
+    img = pygame.image.load("./ressources/boutons/Peashooter.png").convert_alpha() 
     #bouton1 = Bouton("bouton1", 30, 30, 100, 50, "clique")
     PeaShooterBouton = Bouton("PeaShooter", 75, 75,  img, 1)
     model.ajouter_bouton(PeaShooterBouton)
@@ -30,8 +29,8 @@ try:
     # le personnage et son image:
     perso = Personnage(str("perso"),False) #2 attributs, nom et si NPC
     zombie1 = Zombie("zombie1", 1, 0.20, 200, 100)  
-    zombie2 = Zombie("zombie1", 2, 0.67, 200, 100) 
-    zombie3 = Zombie("zombie1", 3, 0.67, 200, 100) 
+    zombie2 = Zombie("zombie1", 2, 0.5, 200, 100) 
+    zombie3 = Zombie("zombie1", 3, 0.5, 200, 100) 
     perso.set_position((300, 300))
     model.personnage = perso
     #modelZombie.personnage = zombie1
@@ -50,18 +49,28 @@ try:
     ### Boucle du jeu
     # chaque tour de boucle est un 'pas' dans le jeux
     while not model.done:
+        #print(len(projectiles))
         clock.tick(60)  #Le jeu est fait pour être joué à 60 FPS
         # d'abord les entrées utilisateur
         controller.gerer_input()
         # puis la logique du jeu
         if len(PeaShooterActuelles) > NbPlantes: #Si une plante a été ajoutée...
-           
             view.add_elem(ViewPersonnage(PeaShooterActuelles[-1])) #Ajout de la dernière plante (Pile)
             NbPlantes = len(PeaShooterActuelles) #on réajuste le total
         i += 1
-        for element in view.elems:
-            element.personnage.update()
+        
+        for element in view.elems: #parcours des éléments visuels (zombies, plantes...)
+            element.personnage.update() #on met à jour leur statut
             element.personnage.modelPerso.update()
+        
+        indice_projectile = 0
+        longueur_projectile_list = len(projectiles)
+        while indice_projectile < longueur_projectile_list: #Une boucle pour parcourir la list contenant nos projectiles (pea)
+            projectiles[indice_projectile].update()
+            if (projectiles[indice_projectile].x) >= 870 or (projectiles[indice_projectile].Est_mort):  #Si le projectile sort de la map ou a touché un zombie...
+                del projectiles[indice_projectile]  #on supprime le projectile de la list
+                longueur_projectile_list = len(projectiles) #Mise à jour longueur list pour éviter un out of range
+            indice_projectile += 1
         tuile = zombie1.obtenir_tuile()
         if i%1000 == 0:
             
