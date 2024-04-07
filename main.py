@@ -54,8 +54,8 @@ try:
         # d'abord les entrées utilisateur
         controller.gerer_input()
         # puis la logique du jeu
-        if len(PeaShooterActuelles) > NbPlantes: #Si une plante a été ajoutée...
-            view.add_elem(ViewPersonnage(PeaShooterActuelles[-1])) #Ajout de la dernière plante (Pile)
+        if len(PeaShooterActuelles) > NbPlantes: #Si une PeaShooter a été ajoutée...
+            view.add_elem(ViewPersonnage(PeaShooterActuelles[-1])) #Ajout de la dernière PeaShooter (Pile)
             NbPlantes = len(PeaShooterActuelles) #on réajuste le total
         i += 1
         

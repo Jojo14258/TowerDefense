@@ -58,7 +58,7 @@ class Controller:
                             tuile = obtenir_tuile(souris_x, souris_y)
                             bouton_sauvegarde = bouton
                             if (tuile != None) and (tuile not in dico_plantes.keys()):
-                                peaShooter = Plante("peaShooter",tuile ,0.8, 600, 40, 5)
+                                peaShooter = PeaShooter("peaShooter",tuile ,0.8, 600, 40, 5)
                                 peaShooter.apparaitre(tuile)
                                 
 

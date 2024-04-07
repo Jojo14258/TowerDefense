@@ -8,7 +8,7 @@ import pygame, view
 # des constantes
 STEP_SIZE = 20
 vitesse = 0.04
-PeaShooterActuelles = [] #Création d'une pile : La dernière plante arrivée est ajouté au visuelle (voir main)
+PeaShooterActuelles = [] #Création d'une pile : La dernière PeaShooter arrivée est ajouté au visuelle (voir main)
 #Zombies = [] #Création d'une list permettant de dénombrer les objets zombies présents
 NbPlantes = len(PeaShooterActuelles)
 Plantes_groupe = pygame.sprite.Group()
@@ -185,11 +185,11 @@ class Zombie(Personnage):
         
     def endommagerPlante(self):
         """
-        Fonction qui s'occupe de réduire la vie de de plante lorsqu'elle celle-ci entre en collision avec un zombie
-        Modifie par effet de bord l'attribut vie de la plante.
+        Fonction qui s'occupe de réduire la vie de de PeaShooter lorsqu'elle celle-ci entre en collision avec un zombie
+        Modifie par effet de bord l'attribut vie de la PeaShooter.
         """
-        plante = dico_plantes[self.tuilesParcourues[-1]]
-        plante.pv -= self.degats
+        PeaShooter = dico_plantes[self.tuilesParcourues[-1]]
+        PeaShooter.pv -= self.degats
         
     def update(self): #surcharge de la classe précédente 
         if not(self.Est_mort):
@@ -214,9 +214,9 @@ class Zombie(Personnage):
             
             
 
-class Plante(Personnage):
+class PeaShooter(Personnage):
     """
-    Une sous classe plante enfant de la classe Personnage.
+    Une sous classe PeaShooter (plante) enfant de la classe Personnage.
     """
     def __init__(self, nom, tuile,vitesse, pv, degats, recharge):
         super().__init__(nom, NPC=True)
@@ -264,14 +264,14 @@ class Plante(Personnage):
         
     def est_presentZombie(self):
         """
-        Sortie - bool : Retourne True si un zombie se situe devant la plante. False si aucun zombie
+        Sortie - bool : Retourne True si un zombie se situe devant le plante. False si aucun zombie
         n'est situé devant (cas où il n'y a aucun zombie ou bien les zombies sont derrière)
         """
         for tuiles in dico_zombies.values():
             for zombie in tuiles.keys():
-                if (zombie.tuilesParcourues[-1] >= self.tuile) and (zombie.tuilesParcourues[-1]//9 == self.tuile//9): #Si un zombie se situe à une tuile supérieur/egale à notre plante, alors...
+                if (zombie.tuilesParcourues[-1] >= self.tuile) and (zombie.tuilesParcourues[-1]//9 == self.tuile//9): #Si un zombie se situe à une tuile supérieur/egale à notre PeaShooter, alors...
                     if(zombie.x) >= 219: #On vérifie que le zombie ne soit pas en dehors de la map
-                        if zombie.tuilesParcourues[-1]//9+1 == self.ligne: #Zombie sur la même ligne que la plante ? 
+                        if zombie.tuilesParcourues[-1]//9+1 == self.ligne: #Zombie sur la même ligne que la PeaShooter ? 
                             return True
                 elif (zombie.tuilesParcourues[-1]%9) == 0: #cas où le zombie est sur la dernière tuile
                     if zombie.tuilesParcourues[-1]//9 == self.ligne:
