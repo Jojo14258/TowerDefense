@@ -99,12 +99,25 @@ class ViewPersonnage(pygame.sprite.Sprite):
         """
         for i in range(1, len(os.listdir(f"ressources/{str(personnage.nom)}_marche"))):
             self.image = pygame.image.load(f"ressources/{str(personnage.nom)}_marche/frame-{i}.gif").convert_alpha()
-            self.image = pygame.transform.scale(self.image, (226//1.2, 153//1.2))
+            if "zombie1" in personnage.nom:
+                self.image = pygame.transform.scale(self.image, (226//1.2, 153//1.2))
+            elif "Football" in personnage.nom:
+                self.image = pygame.transform.scale(self.image, (129//1.2, 156//1.2))
+            elif "Gargantuar" in personnage.nom:
+                self.image = pygame.transform.scale(self.image, (768//2, 724//2))
+            elif "zombieX" in personnage.nom:
+                self.image = pygame.transform.scale(self.image, (226//2.1, 153//1.8))
             self.spritesMarche.append(self.image)    #Initialisation d'un tableau contenant l'ensemble des image d'animation
             
         for i in range(1, len(os.listdir(f"ressources/{str(personnage.nom)}_manger"))):
             self.image = pygame.image.load(f"ressources/{str(personnage.nom)}_manger/frame-{i}.gif").convert_alpha()
-            self.image = pygame.transform.scale(self.image, (226//1.2, 153//1.2))
+            if "zombie1" in personnage.nom:
+                self.image = pygame.transform.scale(self.image, (226//1.2, 153//1.2))
+            elif "Gargantuar" in personnage.nom:
+                self.image = pygame.transform.scale(self.image, (768//1.5, 724//1.5))
+            elif "Football" in personnage.nom:
+                self.image = pygame.transform.scale(self.image, (129//1.2, 156//1.2))
+            
             self.spritesManger.append(self.image) 
         
         self.image = self.spritesMarche[self.actuelle]

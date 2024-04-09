@@ -9,8 +9,10 @@ import pygame, view
 STEP_SIZE = 20
 vitesse = 0.04
 PeaShooterActuelles = [] #Création d'une pile : Le dernier PeaShooter arrivé est ajouté au visuelle (voir main)
+ZombiesActuelles = []
 #Zombies = [] #Création d'une list permettant de dénombrer les objets zombies présents
 NbPlantes = len(PeaShooterActuelles)
+NbZombies = len(ZombiesActuelles)
 Plantes_groupe = pygame.sprite.Group()
 Zombies_groupe = pygame.sprite.Group()
 
@@ -146,12 +148,12 @@ class Zombie(Personnage):
     """
     Une sous classe enfant de la classe Personnage.
     """
-    def __init__(self, nom, ligne, vitesse, pv, degats):
+    def __init__(self, nom, ligne, vitesse_marche, vitesse, pv, degats):
         super().__init__(nom, NPC=True)
         self.ligne = ligne
         self.nom = nom
         self.vitesse = vitesse
-        self.vitesse_marche, self.vitesse_sauvegarde = vitesse, vitesse  #la vitesse du zombie tend à varier, on garde donc en mémoire une variable de sauvegarde
+        self.vitesse_marche, self.vitesse_sauvegarde = vitesse_marche, vitesse_marche  #la vitesse du zombie tend à varier, on garde donc en mémoire une variable de sauvegarde
         self.tuilesParcourues = [ligne*9]
         self.longueur_Tuile = len(self.tuilesParcourues)
         self.pv = pv
@@ -159,6 +161,7 @@ class Zombie(Personnage):
         self.collider = None #valeur assigné dans le viewPersonnage
         self.manger = False
         self.time = 0
+        ZombiesActuelles.append(self)
         dico_zombies[self.tuilesParcourues[-1]][self] = self
         Zombie.apparaitre(self,self.ligne)
       
@@ -300,7 +303,6 @@ class Pea(Personnage):
         self.apparaitre(self.tuile)
         self.Tuiles_Parcourues = []
         self.image = view.image_pea
-        
         self.collider = self.image.get_rect() #on initialise la collision du projectile
         self.collider.x, self.collider.y = self.get_position()
         self.collider.topleft = (self.x, self.y)
@@ -338,4 +340,5 @@ class Pea(Personnage):
                 self.Tuiles_Parcourues.append(self.obtenir_tuile())
             if self.est_presentZombie():
                 self.endommagerZombie()
-                
+
+
