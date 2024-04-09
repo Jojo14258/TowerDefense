@@ -54,6 +54,7 @@ class View:
 
         # dessiner les boutons
         for b in self.model.boutons:
+            print(b.img, (b.rect.x, b.rect.y))
             self.screen.blit(b.img, (b.rect.x, b.rect.y))
 
         pygame.display.update()
@@ -150,6 +151,26 @@ class ViewPersonnage(pygame.sprite.Sprite):
                 
                 self.image = pygame.image.load(f"ressources/{str(personnage.nom)}_marche/frame-{i}.gif").convert_alpha()
                 if "pea" in self.personnage.nom:
+                    self.image = pygame.transform.scale(self.image, (185//2.7, 157//2.7))
+                self.spritesMarche.append(self.image)    #Initialisation d'un tableau contenant l'ensemble des image d'animation basique
+                self.image = self.spritesMarche[self.actuelle]
+        for i in range(1, len(os.listdir(f"ressources/{str(personnage.nom)}_tir"))):
+                self.image = pygame.image.load(f"ressources/{str(personnage.nom)}_tir/frame-{i}.gif").convert_alpha()
+                self.image = pygame.transform.scale(self.image, (185//2.7, 157//2.7))
+                self.spritesTir.append((self.image, f"frame-{i}.gif"))    #Initialisation d'un tableau contenant l'ensemble des image d'animation de tir
+                self.image = self.spritesMarche[self.actuelle]
+
+    def TabAnimationWallnut(self, personnage):
+        """
+        personnage : - l'objet de classe personnage
+        Génère un tableau d'animation à dérouler (sprite). L'animation se fait en fonction de la valeur dans l'attribut
+        personnage.nom
+        Voir vidéo https://www.youtube.com/watch?v=MYaxPa_eZS0
+        """
+        for i in range(1, len(os.listdir(f"ressources/{str(personnage.nom)}_marche"))):
+                
+                self.image = pygame.image.load(f"ressources/{str(personnage.nom)}_marche/frame-{i}.gif").convert_alpha()
+                if "Wallnut" in self.personnage.nom:
                     self.image = pygame.transform.scale(self.image, (185//2.7, 157//2.7))
                 self.spritesMarche.append(self.image)    #Initialisation d'un tableau contenant l'ensemble des image d'animation basique
                 self.image = self.spritesMarche[self.actuelle]

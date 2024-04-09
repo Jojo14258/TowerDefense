@@ -20,10 +20,15 @@ try:
     
     
     # les boutons:
-    img = pygame.image.load("./ressources/boutons/Peashooter.png").convert_alpha() 
+    img = pygame.image.load("./ressources/boutons/Peashooter.png").convert_alpha()
+    img2 = pygame.image.load("./ressources/boutons/WallNut.jpg").convert_alpha()
     #bouton1 = Bouton("bouton1", 30, 30, 100, 50, "clique")
     PeaShooterBouton = Bouton("PeaShooter", 75, 75,  img, 1)
+    WallnutBouton = Bouton("Wallnut", 100, 100,  img2, 1)
+    
+    
     model.ajouter_bouton(PeaShooterBouton)
+    model.ajouter_bouton(WallnutBouton)
     #model.ajouter_bouton()
 
     # le personnage et son image:

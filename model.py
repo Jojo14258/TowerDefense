@@ -342,3 +342,69 @@ class Pea(Personnage):
                 self.endommagerZombie()
 
 
+class Wallnut(Personnage):
+    """
+    Une sous classe Wallnut (noix) enfant de la classe Personnage.
+
+    """
+    def __init__(self, nom, tuile,vitesse, pv, degats, recharge):
+        super().__init__(nom, NPC=True)
+       
+        self.tuile = tuile
+        self.ligne = self.obtenir_ligne()
+        self.nom = nom
+        self.pv = pv
+        self.collider = None #valeur assigné dans le viewPersonnage
+        dico_plantes[tuile] = self
+        PeaShooterActuelles.append(self)
+        
+        
+    def apparaitre(self, tuile):
+        self.x = ((dictiTuile[tuile][0][1]+dictiTuile[tuile][0][0])//2)
+        self.y = ((dictiTuile[tuile][1][0]+dictiTuile[tuile][1][1])//2)
+        
+    def obtenir_ligne(self):
+        """
+        Sortie - int : Retourne le numéro de la ligne sur laquelle est située la plante (en partant de 1).
+        """
+        nbTuiles = 0
+        nbTotal = 0
+        for ligne in range(1, 6):
+            nbTuiles += 9
+            for tuile in range(nbTuiles-8, nbTuiles+1):
+                nbTotal += 1
+                if nbTotal == self.tuile:
+                    return ligne
+                
+    def Mourir(self):
+        """
+        Supprime toute les références à l'instance afin de supprimer l'instance complètement.
+        """
+       # PeaShooterActuelles.remove(self)
+        del dico_plantes[self.tuile] #on supprime toute les références à l'objet
+        self.Est_mort = True
+
+        
+        
+    def est_presentZombie(self):
+        """
+        Sortie - bool : Retourne True si un zombie se situe devant le plante. False si aucun zombie
+        n'est situé devant (cas où il n'y a aucun zombie ou bien les zombies sont derrière)
+        """
+        for tuiles in dico_zombies.values():
+            for zombie in tuiles.keys():
+                if (zombie.tuilesParcourues[-1] >= self.tuile) and (zombie.tuilesParcourues[-1]//9 == self.tuile//9): #Si un zombie se situe à une tuile supérieur/egale à notre PeaShooter, alors...
+                    if(zombie.x) >= 219: #On vérifie que le zombie ne soit pas en dehors de la map
+                        if zombie.tuilesParcourues[-1]//9+1 == self.ligne: #Zombie sur la même ligne que le PeaShooter ? 
+                            return True
+                elif (zombie.tuilesParcourues[-1]%9) == 0: #cas où le zombie est sur la dernière tuile
+                    if zombie.tuilesParcourues[-1]//9 == self.ligne:
+                        return True
+        return False
+        
+                    
+    def update(self): #surcharge de la classe précédente 
+        
+        if not(self.Est_mort):
+            if self.pv <= 0:
+                self.Mourir()
