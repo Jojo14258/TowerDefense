@@ -8,13 +8,11 @@ import pygame, view
 # des constantes
 STEP_SIZE = 20
 vitesse = 0.04
-PeaShooterActuelles = [] #Création d'une pile : Le dernier PeaShooter arrivé est ajouté au visuelle (voir main)
+PlantesActuelles = [] #Création d'une pile : La dernière plante arrivée est ajouté au visuelle (voir main)
 ZombiesActuelles = []
 #Zombies = [] #Création d'une list permettant de dénombrer les objets zombies présents
-NbPlantes = len(PeaShooterActuelles)
+NbPlantes = len(PlantesActuelles)
 NbZombies = len(ZombiesActuelles)
-Plantes_groupe = pygame.sprite.Group()
-Zombies_groupe = pygame.sprite.Group()
 
 class MyDict(dict):
     def __setitem__(self, item, value):
@@ -235,7 +233,7 @@ class PeaShooter(Personnage):
         self.recharge = recharge
         self.collider = None #valeur assigné dans le viewPersonnage
         dico_plantes[tuile] = self
-        PeaShooterActuelles.append(self)
+        PlantesActuelles.append(self)
         
         
     def apparaitre(self, tuile):
@@ -259,7 +257,6 @@ class PeaShooter(Personnage):
         """
         Supprime toute les références à l'instance afin de supprimer l'instance complètement.
         """
-       # PeaShooterActuelles.remove(self)
         del dico_plantes[self.tuile] #on supprime toute les références à l'objet
         self.Est_mort = True
 
@@ -347,7 +344,7 @@ class Wallnut(Personnage):
     Une sous classe Wallnut (noix) enfant de la classe Personnage.
 
     """
-    def __init__(self, nom, tuile,vitesse, pv, degats, recharge):
+    def __init__(self, nom, tuile,vitesse, pv):
         super().__init__(nom, NPC=True)
        
         self.tuile = tuile
@@ -355,8 +352,9 @@ class Wallnut(Personnage):
         self.nom = nom
         self.pv = pv
         self.collider = None #valeur assigné dans le viewPersonnage
+        self.vitesse = vitesse #vitesse d'animation
         dico_plantes[tuile] = self
-        PeaShooterActuelles.append(self)
+        PlantesActuelles.append(self)
         
         
     def apparaitre(self, tuile):
@@ -380,7 +378,6 @@ class Wallnut(Personnage):
         """
         Supprime toute les références à l'instance afin de supprimer l'instance complètement.
         """
-       # PeaShooterActuelles.remove(self)
         del dico_plantes[self.tuile] #on supprime toute les références à l'objet
         self.Est_mort = True
 

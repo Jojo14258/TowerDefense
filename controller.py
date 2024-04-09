@@ -53,14 +53,26 @@ class Controller:
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 for bouton in self.model.boutons:
                     bouton.est_cible(souris_x, souris_y)
-                    if bouton.clique:
+                    if bouton.est_Clique:
                         if bouton.nom == "PeaShooter":
+                            for element in self.model.boutons: #parcours des boutons
+                                if element.est_Clique and (not("Pea" in element.nom)): #Si un autre bouton est déjà cliqué...
+                                    element.deselectionner() #on déselectionne l'autre bouton déjà cliqué
+                            tuile = obtenir_tuile(souris_x, souris_y)
+                            bouton_sauvegarde = bouton
+                            if (tuile != None) and (tuile not in dico_plantes.keys()): #Si une plante n'est pas déjà placé sur la tuile...
+                                peaShooter = PeaShooter("peaShooter",tuile ,0.8, 600, 40, 5) 
+                                peaShooter.apparaitre(tuile)
+                                
+                        elif bouton.nom == "Wallnut":
+                            for element in self.model.boutons:
+                                if element.est_Clique and (not("Wallnut" in element.nom)):
+                                    element.deselectionner()
                             tuile = obtenir_tuile(souris_x, souris_y)
                             bouton_sauvegarde = bouton
                             if (tuile != None) and (tuile not in dico_plantes.keys()):
-                                peaShooter = PeaShooter("peaShooter",tuile ,0.8, 600, 40, 5)
-                                peaShooter.apparaitre(tuile)
-                                
+                                wallnut = Wallnut("wallnut",tuile ,0.3, 900)
+                                wallnut.apparaitre(tuile)
 
             ### fenetre
             elif event.type == pygame.QUIT:
@@ -79,29 +91,38 @@ class Bouton:
         self.largeur = img.get_width()
         self.hauteur = img.get_height()
         self.img = pygame.transform.scale(img, (int(self.largeur*scale), int(self.hauteur*scale)))
-        self.clique = False
+        self.est_Clique = False
         
         
         self.x, self.y = x, y
-        self.rect = self.img.get_rect()
+        self.rect = self.img.get_rect(topleft = (self.x, self.y)) #synchronisation de la collision du bouton avec l'image
+        
         pygame.draw.rect(self.img, (0,0,0), [0, 0, self.rect.width, self.rect.height], 2)
         #self.rect.topleft = (x, y)
+        
+    def deselectionner(self):
+        """
+        Une fonction pour déselectionner un bouton.
+        Sortie - None : Modifie par effet de bord l'attribut est_Clique (bool) à False et redessine la bordure du bouton. 
+        """
+        self.est_Clique = False
+        pygame.draw.rect(self.img, (0,0,0), [0, 0, self.rect.width, self.rect.height], 2)
     def est_cible(self, x, y):
         """
         x et y : la position de la souris
-        Sortie : Vrai si la souris est sur le bouton, Faux sinon
+        Sortie - None : modifie par effet de bord l'attribut est_Clique à True (bool) si la souris est sur le bouton, False (bool) sinon
         """
         
         souris_x, souris_y = pygame.mouse.get_pos()
-        
-        if self.img.get_rect().collidepoint(souris_x, souris_y) and self.clique == False:
-            self.clique = True
+       # print(self.est_Clique)
+        if self.rect.collidepoint(souris_x, souris_y) and self.est_Clique == False:
+            self.est_Clique = True
             pygame.draw.rect(self.img, (255,0,0), [0, 0, self.rect.width, self.rect.height], 2)
 
-        
-        elif self.img.get_rect().collidepoint(souris_x, souris_y) and self.clique:
-            self.clique = False
-            pygame.draw.rect(self.img, (0,0,0), [0, 0, self.rect.width, self.rect.height], 2)
+       
+        elif self.rect.collidepoint(souris_x, souris_y) and self.est_Clique:
+            
+            self.deselectionner()
 
 
 

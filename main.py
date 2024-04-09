@@ -23,8 +23,8 @@ try:
     img = pygame.image.load("./ressources/boutons/Peashooter.png").convert_alpha()
     img2 = pygame.image.load("./ressources/boutons/WallNut.jpg").convert_alpha()
     #bouton1 = Bouton("bouton1", 30, 30, 100, 50, "clique")
-    PeaShooterBouton = Bouton("PeaShooter", 75, 75,  img, 1)
-    WallnutBouton = Bouton("Wallnut", 100, 100,  img2, 1)
+    PeaShooterBouton = Bouton("PeaShooter", 0, 0,  img, 1)
+    WallnutBouton = Bouton("Wallnut", 0, 60,  img2, 1)
     
     
     model.ajouter_bouton(PeaShooterBouton)
@@ -33,13 +33,18 @@ try:
 
     # le personnage et son image:
     perso = Personnage(str("perso"),False) #2 attributs, nom et si NPC
-    zombie4 = Zombie("zombieX", 4, 0.7, 0.7, 200, 100)
-    zombie4 = Zombie("zombieX", 2, 0.7, 0.7, 200, 100)
-    zombie4 = Zombie("zombieX", 1, 0.7, 0.7, 200, 100)
+    #zombie4 = Zombie("zombieX", 4, 0.7, 0.7, 200, 100)
+    #zombie4 = Zombie("zombieX", 2, 0.7, 0.7, 200, 100)
+   # zombie4 = Zombie("zombieX", 1, 0.7, 0.7, 200, 100)
     zombie5 = Zombie("zombieFootball", 1, 0.9, 0.2, 200, 100)
     zombie6 = Zombie("zombieFootball", 5, 0.9, 0.2, 200, 100)
-    zombie7 = Zombie("zombieGargantuar", 4, 0.1, 0.2, 2000, 100)
-    zombie1 = Zombie("zombie1", 1, 0.20, 0.20, 200, 100)  
+    zombie6 = Zombie("zombieFootball", 4, 0.9, 0.2, 200, 100)
+    #zombie7 = Zombie("zombieGargantuar", 4, 0.1, 0.2, 2000, 100)
+    zombie1 = Zombie("zombie1", 1, 0.5, 0.5, 200, 100)  
+    zombie1 = Zombie("zombie1", 4, 0.4, 0.4, 200, 100)  
+    zombie1 = Zombie("zombie1", 5, 0.5, 0.5, 200, 100)  
+    zombie1 = Zombie("zombie1", 3, 0.45, 0.45, 200, 100)  
+    zombie1 = Zombie("zombie1", 4, 0.5, 0.5, 200, 100)  
     zombie2 = Zombie("zombie1", 2, 0.5, 0.5, 200, 100) 
     zombie3 = Zombie("zombie1", 3, 0.5, 0.5, 200, 100) 
     
@@ -64,9 +69,9 @@ try:
         # puis la logique du jeu
         
         #Pour ajouter au visuelle les zombies et les plantes instances
-        if len(PeaShooterActuelles) > NbPlantes: #Si un Peashooter  a été ajoutée...
-            view.add_elem(ViewPersonnage(PeaShooterActuelles[-1])) #Ajout du dernier PeaShooter (Pile)
-            NbPlantes = len(PeaShooterActuelles) #on réajuste le total
+        if len(PlantesActuelles) > NbPlantes: #Si un Peashooter  a été ajoutée...
+            view.add_elem(ViewPersonnage(PlantesActuelles[-1])) #Ajout du dernier PeaShooter (Pile)
+            NbPlantes = len(PlantesActuelles) #on réajuste le total
         #print(len(ZombiesActuelles))
         if len(ZombiesActuelles) > NbZombies: 
             for element in ZombiesActuelles:

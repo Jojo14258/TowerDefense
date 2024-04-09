@@ -54,7 +54,6 @@ class View:
 
         # dessiner les boutons
         for b in self.model.boutons:
-            print(b.img, (b.rect.x, b.rect.y))
             self.screen.blit(b.img, (b.rect.x, b.rect.y))
 
         pygame.display.update()
@@ -83,7 +82,7 @@ class ViewPersonnage(pygame.sprite.Sprite):
         self.actuelle = 0 
         if ("zombie" in str(personnage.nom)):
             self.TabAnimationZombie(personnage)
-        elif ("peaShooter" in str(personnage.nom)):
+        elif ("peaShooter"  in str(personnage.nom)) or  ("wallnut" in str(personnage.nom)):
             self.TabAnimationPlante(personnage)
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = self.personnage.get_position()
@@ -149,36 +148,20 @@ class ViewPersonnage(pygame.sprite.Sprite):
         """
         for i in range(1, len(os.listdir(f"ressources/{str(personnage.nom)}_marche"))):
                 
-                self.image = pygame.image.load(f"ressources/{str(personnage.nom)}_marche/frame-{i}.gif").convert_alpha()
-                if "pea" in self.personnage.nom:
-                    self.image = pygame.transform.scale(self.image, (185//2.7, 157//2.7))
-                self.spritesMarche.append(self.image)    #Initialisation d'un tableau contenant l'ensemble des image d'animation basique
-                self.image = self.spritesMarche[self.actuelle]
-        for i in range(1, len(os.listdir(f"ressources/{str(personnage.nom)}_tir"))):
+            self.image = pygame.image.load(f"ressources/{str(personnage.nom)}_marche/frame-{i}.gif").convert_alpha()
+            if "pea" in self.personnage.nom:
+                self.image = pygame.transform.scale(self.image, (185//2.7, 157//2.7))
+            if "wallnut" in self.personnage.nom:
+                self.image = pygame.transform.scale(self.image, (64//1.2, 72//1.2))
+            self.spritesMarche.append(self.image)    #Initialisation d'un tableau contenant l'ensemble des image d'animation basique
+            self.image = self.spritesMarche[self.actuelle]
+        if "pea" in self.personnage.nom: #seul les peas peuvent tirer, donc seuls eux ont une animation de tir
+            for i in range(1, len(os.listdir(f"ressources/{str(personnage.nom)}_tir"))):
                 self.image = pygame.image.load(f"ressources/{str(personnage.nom)}_tir/frame-{i}.gif").convert_alpha()
                 self.image = pygame.transform.scale(self.image, (185//2.7, 157//2.7))
                 self.spritesTir.append((self.image, f"frame-{i}.gif"))    #Initialisation d'un tableau contenant l'ensemble des image d'animation de tir
                 self.image = self.spritesMarche[self.actuelle]
 
-    def TabAnimationWallnut(self, personnage):
-        """
-        personnage : - l'objet de classe personnage
-        Génère un tableau d'animation à dérouler (sprite). L'animation se fait en fonction de la valeur dans l'attribut
-        personnage.nom
-        Voir vidéo https://www.youtube.com/watch?v=MYaxPa_eZS0
-        """
-        for i in range(1, len(os.listdir(f"ressources/{str(personnage.nom)}_marche"))):
-                
-                self.image = pygame.image.load(f"ressources/{str(personnage.nom)}_marche/frame-{i}.gif").convert_alpha()
-                if "Wallnut" in self.personnage.nom:
-                    self.image = pygame.transform.scale(self.image, (185//2.7, 157//2.7))
-                self.spritesMarche.append(self.image)    #Initialisation d'un tableau contenant l'ensemble des image d'animation basique
-                self.image = self.spritesMarche[self.actuelle]
-        for i in range(1, len(os.listdir(f"ressources/{str(personnage.nom)}_tir"))):
-                self.image = pygame.image.load(f"ressources/{str(personnage.nom)}_tir/frame-{i}.gif").convert_alpha()
-                self.image = pygame.transform.scale(self.image, (185//2.7, 157//2.7))
-                self.spritesTir.append((self.image, f"frame-{i}.gif"))    #Initialisation d'un tableau contenant l'ensemble des image d'animation de tir
-                self.image = self.spritesMarche[self.actuelle]
     
     def animer(self, personnage, vitesse=0.0150):
         if not(self.personnage.Est_mort):
@@ -204,7 +187,10 @@ class ViewPersonnage(pygame.sprite.Sprite):
                     self.image = self.spritesTir[int(self.actuelle)][0]
                     self.Pea_Apparaitre()
                 else:
-                    self.image = self.spritesMarche[int(self.actuelle)]
+                    self.image = self.spritesMarche[int(self.actuelle)] #Si la plante ne tire pas, on la fait marcher.
+            #print("wallnut" in personnage.nom)
+            if "wallnut" in personnage.nom:
+                self.image = self.spritesMarche[int(self.actuelle)]
         else:
             self.image = None 
             
@@ -224,3 +210,5 @@ class ViewPersonnage(pygame.sprite.Sprite):
                 if len(projectiles) != 0: #si il y a un projectile tiré...
                     for element in projectiles:
                         screen.blit(element.image, ((element.get_position()[0] - self.image.get_width()/2.5)+60, element.get_position()[1] - self.image.get_height()+35))
+            elif "wallnut" in str(self.personnage.nom):
+                screen.blit(self.image, ((nouvelle_position[0] - self.image.get_width()/2.5), nouvelle_position[1] - self.image.get_height()+30))
