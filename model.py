@@ -14,10 +14,7 @@ ZombiesActuelles = []
 NbPlantes = len(PlantesActuelles)
 NbZombies = len(ZombiesActuelles)
 
-class MyDict(dict):
-    def __setitem__(self, item, value):
-        
-        super(MyDict, self).__setitem__(item, value)
+
 
 def carteVersMatrice(x, y):
     longueur = 64  #debut = 284 - 220 

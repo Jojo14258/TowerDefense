@@ -5,6 +5,7 @@
 
 import pygame, os, model
 
+
 # des constantes
 SCREEN_WIDTH = 866
 SCREEN_HEIGHT = 514
@@ -12,6 +13,7 @@ ecran =  pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT)) #optimisation : 
 couleur_boutons = (150, 150, 150)
 couleur_fond = (25,200,25)
 projectiles = []  #tableau de l'ensemble des projectiles
+Monnaie = 0
 
 #initialisation des images 
 image_pea = pygame.image.load("./ressources/Pea.png").convert_alpha() #optimisation - au lieu de load dans une classe, on la fait une fois ici
@@ -29,7 +31,9 @@ class View:
         self.screen = ecran
         pygame.display.set_caption("image")
         self.imp = pygame.image.load("./ressources/jardin.png").convert()
-        
+        self.PointsUI = pygame.image.load("ressources/UIPoints.png").convert_alpha()
+        self.font = pygame.font.SysFont(None, 24)
+        self.ecriturePoints = self.font.render(str(Monnaie), True, (0,0,255))
         # liste des éléments à afficher
         self.elems = []
 
@@ -44,6 +48,8 @@ class View:
         Fonction appellée à la fin de chaque tour de simulation du jeu
         """
         self.screen.blit(self.imp, (0, 0))
+        self.screen.blit(self.PointsUI, (0,400))
+        self.screen.blit(self.ecriturePoints, (10, 10))
         # redessine le fond si besoin:
         #self.screen.fill(couleur_fond)
 
