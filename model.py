@@ -4,7 +4,7 @@
 # Ce module comporte tout l'état interne et la logique du jeu
 
 import pygame, view
-
+import time
 # des constantes
 STEP_SIZE = 20
 vitesse = 0.04
@@ -282,7 +282,71 @@ class PeaShooter(Personnage):
             else:
                 self.tirer = False
 
+class SunFlower(Personnage):
+    """
+    Une sous classe PeaShooter (plante) enfant de la classe Personnage.
+    """
+    def __init__(self, nom, tuile,vitesse, pv):
+        super().__init__(nom, NPC=True)
+       
+        self.tuile = tuile
+        self.ligne = self.obtenir_ligne()
+        self.nom = nom
+        self.vitesse = vitesse
+        self.pv = pv
+        self.collider = None #valeur assigné dans le viewPersonnage
+        dico_plantes[tuile] = self
+        PlantesActuelles.append(self)
+        
+        
+    def apparaitre(self, tuile):
+        self.x = ((dictiTuile[tuile][0][1]+dictiTuile[tuile][0][0])//2)
+        self.y = ((dictiTuile[tuile][1][0]+dictiTuile[tuile][1][1])//2)
+        
+    def obtenir_ligne(self):
+        """
+        Sortie - int : Retourne le numéro de la ligne sur laquelle est située la plante (en partant de 1).
+        """
+        nbTuiles = 0
+        nbTotal = 0
+        for ligne in range(1, 6):
+            nbTuiles += 9
+            for tuile in range(nbTuiles-8, nbTuiles+1):
+                nbTotal += 1
+                if nbTotal == self.tuile:
+                    return ligne
+                
+    def Mourir(self):
+        """
+        Supprime toute les références à l'instance afin de supprimer l'instance complètement.
+        """
+        del dico_plantes[self.tuile] #on supprime toute les références à l'objet
+        self.Est_mort = True
 
+        
+        
+    def est_presentZombie(self):
+        """
+        Sortie - bool : Retourne True si un zombie se situe devant le plante. False si aucun zombie
+        n'est situé devant (cas où il n'y a aucun zombie ou bien les zombies sont derrière)
+        """
+        for tuiles in dico_zombies.values():
+            for zombie in tuiles.keys():
+                if (zombie.tuilesParcourues[-1] >= self.tuile) and (zombie.tuilesParcourues[-1]//9 == self.tuile//9): #Si un zombie se situe à une tuile supérieur/egale à notre PeaShooter, alors...
+                    if(zombie.x) >= 219: #On vérifie que le zombie ne soit pas en dehors de la map
+                        if zombie.tuilesParcourues[-1]//9+1 == self.ligne: #Zombie sur la même ligne que le PeaShooter ? 
+                            return True
+                elif (zombie.tuilesParcourues[-1]%9) == 0: #cas où le zombie est sur la dernière tuile
+                    if zombie.tuilesParcourues[-1]//9 == self.ligne:
+                        return True
+        return False
+        
+                    
+    def update(self): #surcharge de la classe précédente 
+        
+        if not(self.Est_mort):
+            if self.pv <= 0:
+                self.Mourir()
 class Pea(Personnage):
     """
     Une sous classe enfant de la classe Personnage. Il s'agit du projectile envoyé par les PeaShooters.
@@ -336,7 +400,27 @@ class Pea(Personnage):
                 self.Tuiles_Parcourues.append(self.obtenir_tuile())
             if self.est_presentZombie():
                 self.endommagerZombie()
+class Sun(Personnage):
+    """
+    Une sous classe enfant de la classe Personnage. Il s'agit du projectile envoyé par les PeaShooters.
+    """
+    def __init__(self, tuile, nom):
+        super().__init__(nom,  NPC=True)
+        self.tuile = tuile
+        self.nom = nom 
+        self.apparaitre(self.tuile)
+        self.image = view.image_Sun
 
+    def apparaitre(self, tuile):
+        self.x = ((dictiTuile[tuile][0][1]+dictiTuile[tuile][0][0])//2)
+        self.y = ((dictiTuile[tuile][1][0]+dictiTuile[tuile][1][1])//2)
+
+    def sun_appear(self):
+        self.apparaitre()
+        time.sleep(3)
+        
+    def update(self):
+        pass
 
 class Wallnut(Personnage):
     """
@@ -404,8 +488,4 @@ class Wallnut(Personnage):
         if not(self.Est_mort):
             if self.pv <= 0:
                 self.Mourir()
-def economie():
-    
-        view.Monnaie += 10
-        print(f"Argent: {view.Monnaie}")
-        time.sleep(1)
+

@@ -4,7 +4,7 @@
 # Ce module comporte le code pour afficher le jeu
 
 import pygame, os, model
-
+from random import randint
 
 # des constantes
 SCREEN_WIDTH = 866
@@ -13,11 +13,12 @@ ecran =  pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT)) #optimisation : 
 couleur_boutons = (150, 150, 150)
 couleur_fond = (25,200,25)
 projectiles = []  #tableau de l'ensemble des projectiles
-
+Suns = []
 
 #initialisation des images 
 image_pea = pygame.image.load("./ressources/Pea.png").convert_alpha() #optimisation - au lieu de load dans une classe, on la fait une fois ici
 image_pea = pygame.transform.scale(image_pea, (2000//70, 2000//70)) #cela permet de ne pas charger à chaque instance l'image lorsqu'un pea est tiré
+image_Sun = pygame.image.load("./ressources/SunPvZH.webp").convert_alpha()
 
 class View:
     """
@@ -161,7 +162,17 @@ class ViewPersonnage(pygame.sprite.Sprite):
             self.actuelle += 1
             Pea = model.Pea(self.personnage.tuile, 1, self.personnage.degats, "Pea")
             projectiles.append(Pea)
-            
+
+    def Sun_Apparaitre(self):
+        """
+        Cette fonction permet au PeaShooter d'envoyer un projectile (Pea). 
+        Le délai est géré par la vitesse d'animation, lorsqu'une certaine frame spécifique est atteinte, 
+        une nouvelle instance Pea est automatiquement créé et répertiorié dans la variable globale "projectiles" dont les éléments
+        sont mis à jour dans le while du main.
+        """
+        Sun = model.Sun(randint(1,45), "Sun")
+        Suns.append(Sun)
+        
         
     def TabAnimationPlante(self, personnage):
         """
@@ -214,6 +225,8 @@ class ViewPersonnage(pygame.sprite.Sprite):
                     self.image = self.spritesMarche[int(self.actuelle)] #Si la plante ne tire pas, on la fait marcher.
             if "wallnut" in personnage.nom:
                 self.image = self.spritesMarche[int(self.actuelle)]
+            if "Sun" in personnage.nom:
+                self.Sun_Apparaitre()
         else:
             self.image = None 
             
@@ -235,3 +248,7 @@ class ViewPersonnage(pygame.sprite.Sprite):
                         screen.blit(element.image, ((element.get_position()[0] - self.image.get_width()/2.5)+60, element.get_position()[1] - self.image.get_height()+35))
             elif "wallnut" in str(self.personnage.nom):
                 screen.blit(self.image, ((nouvelle_position[0] - self.image.get_width()/2.5), nouvelle_position[1] - self.image.get_height()+30))
+            elif "Sun" in str(self.personnage.nom):
+                if len(Suns) != 0: #si il y a un projectile tiré...
+                    for element in Suns:
+                        screen.blit(element.image, ((element.get_position()[0] - self.image.get_width()/2.5)+60, element.get_position()[1] - self.image.get_height()+35))

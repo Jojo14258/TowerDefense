@@ -83,8 +83,7 @@ try:
                 for element in ZombiesActuelles:
                     view.add_elem(ViewPersonnage(element)) 
                     NbZombies = len(ZombiesActuelles) 
-
-            
+    
             
             for element in view.elems: #parcours des éléments visuels (zombies, plantes...)
                 element.personnage.update() #on met à jour leur statut
