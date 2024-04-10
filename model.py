@@ -4,7 +4,7 @@
 # Ce module comporte tout l'état interne et la logique du jeu
 
 import pygame, view
-
+import time
 # des constantes
 STEP_SIZE = 20
 vitesse = 0.04
@@ -402,3 +402,9 @@ class Wallnut(Personnage):
         if not(self.Est_mort):
             if self.pv <= 0:
                 self.Mourir()
+def economie():
+    argent = 300
+    while True:
+        argent += 10
+        print(f"Argent: {argent}")
+        time.sleep(1)
