@@ -13,7 +13,7 @@ ecran =  pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT)) #optimisation : 
 couleur_boutons = (150, 150, 150)
 couleur_fond = (25,200,25)
 projectiles = []  #tableau de l'ensemble des projectiles
-Monnaie = 0
+
 
 #initialisation des images 
 image_pea = pygame.image.load("./ressources/Pea.png").convert_alpha() #optimisation - au lieu de load dans une classe, on la fait une fois ici
@@ -30,12 +30,15 @@ class View:
         # l'écran du jeu
         self.screen = ecran
         pygame.display.set_caption("image")
+        self.menu = pygame.image.load("ressources/Menu.jpg").convert_alpha()
         self.imp = pygame.image.load("./ressources/jardin.png").convert()
         self.PointsUI = pygame.image.load("ressources/UIPoints.png").convert_alpha()
         self.font = pygame.font.SysFont(None, 24)
-        self.ecriturePoints = self.font.render(str(Monnaie), True, (0,0,255))
+        self.ecriturePoints = self.font.render(str(100), True, (0,0,0))
+        self.Jouer = False #Le mode jeu n'est pas encore activé
         # liste des éléments à afficher
         self.elems = []
+        
 
     def get_screen(self):
         return self.screen
@@ -47,9 +50,16 @@ class View:
         """
         Fonction appellée à la fin de chaque tour de simulation du jeu
         """
-        self.screen.blit(self.imp, (0, 0))
-        self.screen.blit(self.PointsUI, (0,400))
-        self.screen.blit(self.ecriturePoints, (10, 10))
+
+        if self.Jouer:
+            Argent = self.model.boutons["PeaShooter"].monnaie #Si les boutons sont bien initialisés
+            self.ecriturePoints = self.font.render(str(Argent), True, (0,0,0)) #ecriture du nombre d'argent
+            if  Argent > 1000:
+                self.ecriturePoints = self.font.render(str(1000)+'+', True, (0,0,0))
+            self.screen.blit(self.imp, (0, 0))
+            self.screen.blit(self.PointsUI, (0,400))
+            self.screen.blit(self.ecriturePoints, (32, 482)) #affichage de l'argent
+
         # redessine le fond si besoin:
         #self.screen.fill(couleur_fond)
 
@@ -59,11 +69,19 @@ class View:
             elem.draw(self.screen)
 
         # dessiner les boutons
-        for b in self.model.boutons:
-            self.screen.blit(b.img, (b.rect.x, b.rect.y))
-
+        if "Jouer" in self.model.boutons.keys():
+            if self.model.boutons["Jouer"].est_Clique: #Si le bouton "jouer" du menu est cliqué..."
+                del self.model.boutons["Jouer"] #On le retire des boutons
+            else:
+                BoutonJouer = self.model.boutons["Jouer"] #Si le bouton n'est pas encore cliqué, on continue d'afficher le menu
+                self.screen.blit(self.menu, (self.menu.get_rect().x, self.menu.get_rect().y))
+                self.screen.blit(BoutonJouer.img, (BoutonJouer.rect.x, BoutonJouer.rect.y))
+    
+        elif "Jouer" not in self.model.boutons.keys():  #Si le bouon "jouer" a été supprimé (et cliqué donc)
+            for instance in self.model.boutons.values(): #On parcours l'ensemble des boutons
+                if instance.nom != "Jouer":  #On affiche tout sauf le bouton jouer qu'on retire
+                    self.screen.blit(instance.img, (instance.rect.x, instance.rect.y))
         pygame.display.update()
-
 
 class ViewPersonnage(pygame.sprite.Sprite):
     """
@@ -153,7 +171,7 @@ class ViewPersonnage(pygame.sprite.Sprite):
         Voir vidéo https://www.youtube.com/watch?v=MYaxPa_eZS0
         """
         for i in range(1, len(os.listdir(f"ressources/{str(personnage.nom)}_marche"))):
-                
+             
             self.image = pygame.image.load(f"ressources/{str(personnage.nom)}_marche/frame-{i}.gif").convert_alpha()
             if "pea" in self.personnage.nom:
                 self.image = pygame.transform.scale(self.image, (185//2.7, 157//2.7))
@@ -194,7 +212,6 @@ class ViewPersonnage(pygame.sprite.Sprite):
                     self.Pea_Apparaitre()
                 else:
                     self.image = self.spritesMarche[int(self.actuelle)] #Si la plante ne tire pas, on la fait marcher.
-            #print("wallnut" in personnage.nom)
             if "wallnut" in personnage.nom:
                 self.image = self.spritesMarche[int(self.actuelle)]
         else:

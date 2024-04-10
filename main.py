@@ -22,14 +22,15 @@ try:
     # les boutons:
     img = pygame.image.load("./ressources/boutons/Peashooter.png").convert_alpha()
     img2 = pygame.image.load("./ressources/boutons/WallNut.jpg").convert_alpha()
+    img3 = pygame.image.load("./ressources/boutons/JouerBouton.png").convert_alpha()
+    img4 = pygame.image.load("./ressources/boutons/pelle.png")
     #bouton1 = Bouton("bouton1", 30, 30, 100, 50, "clique")
     PeaShooterBouton = Bouton("PeaShooter", 0, 0,  img, 1)
     WallnutBouton = Bouton("Wallnut", 0, 60,  img2, 1)
+    BoutonJouer = Bouton("Jouer",200, 200, img3, 1)
+    BoutonEffacer = Bouton("Effacer", 125, 0, img4,0.5)
     
-    
-    model.ajouter_bouton(PeaShooterBouton)
-    model.ajouter_bouton(WallnutBouton)
-    #model.ajouter_bouton()
+    model.ajouter_bouton(BoutonJouer)
 
     # le personnage et son image:
     perso = Personnage(str("perso"),False) #2 attributs, nom et si NPC
@@ -40,13 +41,13 @@ try:
     zombie6 = Zombie("zombieFootball", 5, 0.9, 0.2, 200, 100)
     zombie6 = Zombie("zombieFootball", 4, 0.9, 0.2, 200, 100)
     #zombie7 = Zombie("zombieGargantuar", 4, 0.1, 0.2, 2000, 100)
-    zombie1 = Zombie("zombie1", 1, 0.5, 0.5, 200, 100)  
-    zombie1 = Zombie("zombie1", 4, 0.4, 0.4, 200, 100)  
-    zombie1 = Zombie("zombie1", 5, 0.5, 0.5, 200, 100)  
-    zombie1 = Zombie("zombie1", 3, 0.45, 0.45, 200, 100)  
-    zombie1 = Zombie("zombie1", 4, 0.5, 0.5, 200, 100)  
-    zombie2 = Zombie("zombie1", 2, 0.5, 0.5, 200, 100) 
-    zombie3 = Zombie("zombie1", 3, 0.5, 0.5, 200, 100) 
+    zombie1 = Zombie("zombie1", 1, 0.3, 0.5, 200, 100)  
+    zombie1 = Zombie("zombie1", 4, 0.3, 0.4, 200, 100)  
+    zombie1 = Zombie("zombie1", 5, 0.3, 0.5, 200, 100)  
+    zombie1 = Zombie("zombie1", 3, 0.3, 0.45, 200, 100)  
+    zombie1 = Zombie("zombie1", 4, 0.3, 0.5, 200, 100)  
+    zombie2 = Zombie("zombie1", 2, 0.3, 0.5, 200, 100) 
+    zombie3 = Zombie("zombie1", 3, 0.3, 0.5, 200, 100) 
     
     perso.set_position((300, 300))
     model.personnage = perso
@@ -69,47 +70,36 @@ try:
         # puis la logique du jeu
         
         #Pour ajouter au visuelle les zombies et les plantes instances
-        if len(PlantesActuelles) > NbPlantes: #Si un Peashooter  a été ajoutée...
-            view.add_elem(ViewPersonnage(PlantesActuelles[-1])) #Ajout du dernier PeaShooter (Pile)
-            NbPlantes = len(PlantesActuelles) #on réajuste le total
-        #print(len(ZombiesActuelles))
-        if len(ZombiesActuelles) > NbZombies: 
-            for element in ZombiesActuelles:
-                view.add_elem(ViewPersonnage(element)) 
-                NbZombies = len(ZombiesActuelles) 
+        if BoutonJouer.est_Clique:
+            model.ajouter_bouton(PeaShooterBouton)
+            model.ajouter_bouton(WallnutBouton)
+            model.ajouter_bouton(BoutonEffacer)
+            view.Jouer = True #On active la fenêtre de jeu
+            if len(PlantesActuelles) > NbPlantes: #Si un Peashooter  a été ajoutée...
+                view.add_elem(ViewPersonnage(PlantesActuelles[-1])) #Ajout du dernier PeaShooter (Pile)
+                NbPlantes = len(PlantesActuelles) #on réajuste le total
+            #print(len(ZombiesActuelles))
+            if len(ZombiesActuelles) > NbZombies: 
+                for element in ZombiesActuelles:
+                    view.add_elem(ViewPersonnage(element)) 
+                    NbZombies = len(ZombiesActuelles) 
 
-          
-          
-        for element in view.elems: #parcours des éléments visuels (zombies, plantes...)
-            element.personnage.update() #on met à jour leur statut
-            element.personnage.modelPerso.update()
-        
-        indice_projectile = 0
-        longueur_projectile_list = len(projectiles)
-        #Une boucle qui met à jour les projectiles (pea)
-        while indice_projectile < longueur_projectile_list: #Une boucle pour parcourir la list contenant nos projectiles (pea)
-            projectiles[indice_projectile].update()
-            if (projectiles[indice_projectile].x) >= 870 or (projectiles[indice_projectile].Est_mort):  #Si le projectile sort de la map ou a touché un zombie...
-                del projectiles[indice_projectile]  #on supprime le projectile de la list
-                longueur_projectile_list = len(projectiles) #Mise à jour longueur list pour éviter un out of range
-            indice_projectile += 1
+            
+            
+            for element in view.elems: #parcours des éléments visuels (zombies, plantes...)
+                element.personnage.update() #on met à jour leur statut
+                element.personnage.modelPerso.update()
+            
+            indice_projectile = 0
+            longueur_projectile_list = len(projectiles)
+            #Une boucle qui met à jour les projectiles (pea)
+            while indice_projectile < longueur_projectile_list: #Une boucle pour parcourir la list contenant nos projectiles (pea)
+                projectiles[indice_projectile].update()
+                if (projectiles[indice_projectile].x) >= 870 or (projectiles[indice_projectile].Est_mort):  #Si le projectile sort de la map ou a touché un zombie...
+                    del projectiles[indice_projectile]  #on supprime le projectile de la list
+                    longueur_projectile_list = len(projectiles) #Mise à jour longueur list pour éviter un out of range
+                indice_projectile += 1
 
-        if i%1000 == 0:
-            if zombie1.obtenir_tuile() == None:
-                if zombie1.obtenir_ligne() >=5:
-                    zombie1.apparaitre(1)
-                else:
-                    zombie1.apparaitre(zombie1.obtenir_ligne()+1)
-            if zombie2.obtenir_tuile() == None:
-                if zombie2.obtenir_ligne() >=5:
-                    zombie2.apparaitre(1)
-                else:
-                    zombie2.apparaitre(zombie2.obtenir_ligne()+1)
-            if zombie3.obtenir_tuile() == None:
-                if zombie3.obtenir_ligne() >=5:
-                    zombie3.apparaitre(1)
-                else:
-                    zombie3.apparaitre(zombie3.obtenir_ligne()+1)
         view.draw()
         pygame.display.flip()
 

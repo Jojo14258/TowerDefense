@@ -4,7 +4,7 @@
 # Ce module comporte tout l'état interne et la logique du jeu
 
 import pygame, view
-import time
+
 # des constantes
 STEP_SIZE = 20
 vitesse = 0.04
@@ -13,7 +13,7 @@ ZombiesActuelles = []
 #Zombies = [] #Création d'une list permettant de dénombrer les objets zombies présents
 NbPlantes = len(PlantesActuelles)
 NbZombies = len(ZombiesActuelles)
-
+Monnaie = 550
 
 
 def carteVersMatrice(x, y):
@@ -44,6 +44,7 @@ def obtenir_tuile(x, y):
         #print("Erreur de code")
         return None
 
+
 class Model:
     """
     Une classe qui contient tous les éléments logiques du jeux
@@ -53,7 +54,7 @@ class Model:
 
         # on initialise les attributs necessaires
         self.personnage = None
-        self.boutons = []
+        self.boutons = {} #Les clés sont le nom du bouton, les valeurs ; son instance
         # un booleen qui dit si le jeu est fini
         self.done = False
 
@@ -67,7 +68,8 @@ class Model:
         """
         Fonction qui permet de rajouter un bouton a la liste des boutons
         """
-        self.boutons.append(bouton)
+        if bouton.nom not in self.boutons.keys():
+            self.boutons[bouton.nom] = bouton
 
     def update(self):
         """
@@ -97,7 +99,10 @@ class Personnage:
     def get_position(self):
         return (self.x, self.y)
 
-    def obtenir_tuile(self,):
+    def obtenir_tuile(self):
+        """
+       Sortie - int : Retourne le numéro sur lequel se trouve l'entité. Si l'entité n'est pas sur une tuile d'herbe, None est retourné.
+        """
         for keys, values in dictiTuile.items():
             if (values[0][0] <= self.x <= values[0][1]) and (values[1][0] <= self.y <= values[1][1]):
                 return keys 
@@ -105,34 +110,22 @@ class Personnage:
         return None
     
     def obtenir_ligne(self):
-            nbTuiles = 0
-            for ligne in range(1, 6):
-                nbTuiles += 9
-                for tuile in range(nbTuiles-8, nbTuiles+1):
-                    if self.obtenir_tuile() == None: #cela signifie que le zombie est sorti horizontalement de la matrice
-                        DerniereTuileParcourue = self.tuilesParcourues[-1]
-                        return (DerniereTuileParcourue//9)+1
-                    elif (dictiTuile[tuile][0][0] <= self.x <= dictiTuile[tuile][0][1]) and (dictiTuile[tuile][1][0] <= self.y <= dictiTuile[tuile][1][1]):
-                        return ligne
+        """
+        Sortie - int : Retourne le numéro de la ligne sur laquelle est présent le personnage.
+        """
+        nbTuiles = 0
+        for ligne in range(1, 6):
+            nbTuiles += 9
+            for tuile in range(nbTuiles-8, nbTuiles+1):
+                if self.obtenir_tuile() == None: #cela signifie que le zombie est sorti horizontalement de la matrice
+                    DerniereTuileParcourue = self.tuilesParcourues[-1]
+                    return (DerniereTuileParcourue//9)+1
+                elif (dictiTuile[tuile][0][0] <= self.x <= dictiTuile[tuile][0][1]) and (dictiTuile[tuile][1][0] <= self.y <= dictiTuile[tuile][1][1]):
+                    return ligne
                     
     def set_position(self, pos):
         self.x, self.y = pos
-        
-    
-
-    def deplacer(self, direction):
-
-        if not(self.NPC):
-            if direction == "haut":
-                self.y += -STEP_SIZE
-            if direction == "bas":
-                self.y -= -STEP_SIZE
-            if direction == "droite":
-                self.x -= -STEP_SIZE
-            if direction == "gauche":
-                self.x += -STEP_SIZE
                 
-     
 
     def update(self):
         if self.NPC:
@@ -178,6 +171,9 @@ class Zombie(Personnage):
                 return False
     
     def Mourir(self):
+        """
+        Fonction qui retire toute référence à l'objet dans les variables globales et rend l'objet inactif.
+        """
         del dico_zombies[self.tuilesParcourues[-1]][self]
         self.Est_mort = True
         
@@ -288,6 +284,9 @@ class PeaShooter(Personnage):
 
 
 class Pea(Personnage):
+    """
+    Une sous classe enfant de la classe Personnage. Il s'agit du projectile envoyé par les PeaShooters.
+    """
     def __init__(self, tuile, vitesse, degats, nom):
         super().__init__(nom,  NPC=True)
         self.vitesse = 10
@@ -304,6 +303,9 @@ class Pea(Personnage):
           
         
     def est_presentZombie(self):
+        """
+        Sortie - Bool : Renvoi True si un zombie est présent sur la même tuile que le projectile. False sinon.
+        """
         if self.collider != None:
             tuile = self.Tuiles_Parcourues[-1]
             if len(dico_zombies[tuile]) != 0: #si la tuile où se trouve le projectile n'est pas vide...
@@ -403,8 +405,7 @@ class Wallnut(Personnage):
             if self.pv <= 0:
                 self.Mourir()
 def economie():
-    argent = 300
-    while True:
-        argent += 10
-        print(f"Argent: {argent}")
+    
+        view.Monnaie += 10
+        print(f"Argent: {view.Monnaie}")
         time.sleep(1)
