@@ -45,6 +45,7 @@ class View:
         return self.screen
 
     def add_elem(self, elem):
+        print("test")
         self.elems.append(elem)
 
     def draw(self):

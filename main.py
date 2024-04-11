@@ -22,6 +22,7 @@ try:
     zombies_caracteristiques = {"zombie1":["zombie1", randint(1,5), 0.3, 0.5, 200, 100], "zombieFootball": ["zombieFootball", randint(1,5), 0.9, 0.2, 200, 100]}
     niveau_actuel = 1
     Perdu = False
+    recommencer = False
     #print(map(220,  154))
     
     
@@ -166,19 +167,38 @@ try:
     while not model.done:
         clock.tick(60)  #Le jeu est fait pour être joué à 60 FPS
         controller.gerer_input()
-        if BoutonJouer.est_Clique:
-            jouer()
+        if (BoutonJouer.est_Clique) or (not(Perdu)):
+            jouer() #Le bug doit se trouver ici
+            print(len(ZombiesActuelles))
             ajouter_monnaie()
             niveau()
             NbSunFlowers = 0
-            if Perdu:
+            if (Perdu):
                 BoutonJouer.est_Clique = False
-                View.jouer = False
-                model.reinitialiser_boutons()
+        elif Perdu:
+            print(False)
+            zombies_stocker = []
+            for tuiles in dico_zombies.values():
+                for zombies in tuiles:
+                    zombies_stocker.append(zombies)
+            for zombies in zombies_stocker:
+                zombies.Mourir()
+            View.jouer = False
+            model.reinitialiser_boutons()
+            if (dico_zombies != {}) or (dico_plantes != {}):
                 dico_zombies = {}
                 dico_plantes = {}
+            if "Jouer" not in model.boutons.keys():
                 BoutonJouer = Bouton("Jouer",200, 200, img3, 1)
-
+                model.ajouter_bouton(BoutonJouer)
+            if BoutonJouer.est_Clique:
+                NbPlantes = 0
+                NbZombies = 0
+                NbSunFlowers = 0
+                ZombiesActuelles = []
+                PlantesActuelles = []
+                Perdu = False
+        
         view.draw()
         pygame.display.flip()
 

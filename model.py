@@ -230,7 +230,7 @@ class Zombie(Personnage):
                     self.time = 0
             if not(self.est_presentPlante()):
                 self.manger = False   #On met fin au mode "manger"
-            if self.x <= 196:
+            if self.x <= 196 and self.a_Perdu == False:
                 self.a_Perdu = True
             
 
