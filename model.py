@@ -10,13 +10,19 @@ STEP_SIZE = 20
 vitesse = 0.04
 PlantesActuelles = [] #Création d'une pile : La dernière plante arrivée est ajouté au visuelle (voir main)
 ZombiesActuelles = []
-#Zombies = [] #Création d'une list permettant de dénombrer les objets zombies présents
+SunFlowersActuelles = [] #Tableau utilisé pour cumuler les boosts d'argent des sunflowers
 NbPlantes = len(PlantesActuelles)
 NbZombies = len(ZombiesActuelles)
-Monnaie = 550
-
-
+NbSunFlowers = 0
+Monnaie = 100
 def carteVersMatrice(x, y):
+    """
+    x - int : Coordonnée en abscisse de la 1ere tuile (en haut à gauche).
+    y - int : Coordonnée en ordonnée de la 1ere tuile.
+    Sortie : dict - Dictionnaire dont chaque clé correspond au numéro d'une tuile. La valeur contenue contient est un double tuple de tuple
+    de la forme (abscisse_origine, (abscisse_arrivée), (ordonnee_origine), (ordonnee_arrivee). Cela permet de récupérer les coordonées
+    graphique d'une tuile.
+    """
     longueur = 64  #debut = 284 - 220 
     largeur = 81  #235 - 154
     departy = (y-largeur)
@@ -38,11 +44,17 @@ dictiTuile = {1: ([220, 284], [74, 155]), 2: ([284, 358], [74, 155]), 3: ([358, 
 
 #On corrige les imperfections liés aux irrégularités du terrain (voir le commit 04.5 du Github pour la correction manuelle avec le code)
 def obtenir_tuile(x, y):
-        for keys, values in dictiTuile.items():
-            if (values[0][0] <= x <= values[0][1]) and (values[1][0] <= y <= values[1][1]):
-                return keys 
+    """
+    x - int : La position en abscisse de la souris.
+    y - int : La position en ordonnee de la souris.
+    Sortie - Int : Retourne le numéro de la tuile lorsque la souris clique sur la matrice d'herbe. None est retourné
+    si la souris clique en dehors. Utilisé dans controller.py
+    """
+    for keys, values in dictiTuile.items():
+        if (values[0][0] <= x <= values[0][1]) and (values[1][0] <= y <= values[1][1]):
+            return keys 
         #print("Erreur de code")
-        return None
+    return None
 
 
 class Model:
@@ -70,7 +82,19 @@ class Model:
         """
         if bouton.nom not in self.boutons.keys():
             self.boutons[bouton.nom] = bouton
-
+            
+    def reinitialiser_boutons(self):
+        """
+        Fonction qui enlève tous les boutons de la liste.
+        """
+        boutons_a_supp = []
+        for boutons in self.boutons.values(): #on ne peut pas modif un dictionnaire en itération
+            if boutons.nom != "Jouer":
+                boutons_a_supp.append(boutons.nom)
+        for boutons_nom in boutons_a_supp:
+            del self.boutons[boutons_nom]
+            
+    
     def update(self):
         """
         Fonction appellée à chaque tour de simulation du jeu
@@ -149,9 +173,10 @@ class Zombie(Personnage):
         self.collider = None #valeur assigné dans le viewPersonnage
         self.manger = False
         self.time = 0
+        self.a_Perdu = False
         ZombiesActuelles.append(self)
         dico_zombies[self.tuilesParcourues[-1]][self] = self
-        Zombie.apparaitre(self,self.ligne)
+        self.apparaitre(self.ligne)
       
     
     def apparaitre(self, ligne):
@@ -205,7 +230,8 @@ class Zombie(Personnage):
                     self.time = 0
             if not(self.est_presentPlante()):
                 self.manger = False   #On met fin au mode "manger"
-            
+            if self.x <= 196:
+                self.a_Perdu = True
             
 
 class PeaShooter(Personnage):
@@ -221,7 +247,6 @@ class PeaShooter(Personnage):
         self.vitesse = vitesse
         self.tirer = False
         self.pv = pv
-        self.interval_tir = 5000
         self.degats = degats
         self.recharge = recharge
         self.collider = None #valeur assigné dans le viewPersonnage
@@ -286,18 +311,21 @@ class SunFlower(Personnage):
     """
     Une sous classe PeaShooter (plante) enfant de la classe Personnage.
     """
-    def __init__(self, nom, tuile,vitesse, pv):
+    def __init__(self, nom, tuile,vitesse, pv, degats, recharge):
         super().__init__(nom, NPC=True)
        
         self.tuile = tuile
         self.ligne = self.obtenir_ligne()
         self.nom = nom
         self.vitesse = vitesse
+        self.tirer = False
         self.pv = pv
+        self.degats = degats
+        self.recharge = recharge
         self.collider = None #valeur assigné dans le viewPersonnage
         dico_plantes[tuile] = self
         PlantesActuelles.append(self)
-        
+        SunFlowersActuelles.append(self)
         
     def apparaitre(self, tuile):
         self.x = ((dictiTuile[tuile][0][1]+dictiTuile[tuile][0][0])//2)
@@ -323,23 +351,6 @@ class SunFlower(Personnage):
         del dico_plantes[self.tuile] #on supprime toute les références à l'objet
         self.Est_mort = True
 
-        
-        
-    def est_presentZombie(self):
-        """
-        Sortie - bool : Retourne True si un zombie se situe devant le plante. False si aucun zombie
-        n'est situé devant (cas où il n'y a aucun zombie ou bien les zombies sont derrière)
-        """
-        for tuiles in dico_zombies.values():
-            for zombie in tuiles.keys():
-                if (zombie.tuilesParcourues[-1] >= self.tuile) and (zombie.tuilesParcourues[-1]//9 == self.tuile//9): #Si un zombie se situe à une tuile supérieur/egale à notre PeaShooter, alors...
-                    if(zombie.x) >= 219: #On vérifie que le zombie ne soit pas en dehors de la map
-                        if zombie.tuilesParcourues[-1]//9+1 == self.ligne: #Zombie sur la même ligne que le PeaShooter ? 
-                            return True
-                elif (zombie.tuilesParcourues[-1]%9) == 0: #cas où le zombie est sur la dernière tuile
-                    if zombie.tuilesParcourues[-1]//9 == self.ligne:
-                        return True
-        return False
         
                     
     def update(self): #surcharge de la classe précédente 
@@ -400,27 +411,6 @@ class Pea(Personnage):
                 self.Tuiles_Parcourues.append(self.obtenir_tuile())
             if self.est_presentZombie():
                 self.endommagerZombie()
-class Sun(Personnage):
-    """
-    Une sous classe enfant de la classe Personnage. Il s'agit du projectile envoyé par les PeaShooters.
-    """
-    def __init__(self, tuile, nom):
-        super().__init__(nom,  NPC=True)
-        self.tuile = tuile
-        self.nom = nom 
-        self.apparaitre(self.tuile)
-        self.image = view.image_Sun
-
-    def apparaitre(self, tuile):
-        self.x = ((dictiTuile[tuile][0][1]+dictiTuile[tuile][0][0])//2)
-        self.y = ((dictiTuile[tuile][1][0]+dictiTuile[tuile][1][1])//2)
-
-    def sun_appear(self):
-        self.apparaitre()
-        time.sleep(3)
-        
-    def update(self):
-        pass
 
 class Wallnut(Personnage):
     """

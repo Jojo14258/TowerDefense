@@ -65,6 +65,18 @@ class Controller:
                                         wallnut = Wallnut("wallnut",tuile ,0.3, 900)
                                         wallnut.apparaitre(tuile)
                                         self.model.boutons["PeaShooter"].monnaie -= 50
+                            
+                            elif bouton.nom == "Sunflower":
+                                for element in self.model.boutons.values():
+                                    if element.est_Clique and (not("Sunflower" in element.nom)): #Si un autre bouton est déjà cliqué...
+                                        element.deselectionner()
+                                tuile = obtenir_tuile(souris_x, souris_y)
+                                bouton_sauvegarde = bouton
+                                if Monnaie - 50 >=0: #Si le joueur a assez d'argent...
+                                    if (tuile != None) and (tuile not in dico_plantes.keys()):  #Si une plante n'est pas déjà placé sur la tuile...
+                                        sunflower = SunFlower("sunFlower",tuile ,0.8, 600, 40, 5) 
+                                        sunflower.apparaitre(tuile)
+                                        self.model.boutons["PeaShooter"].monnaie -= 50
                                         
                             elif bouton.nom == "Effacer":
                                 for element in self.model.boutons.values():
@@ -74,7 +86,6 @@ class Controller:
                                 tuile = obtenir_tuile(souris_x, souris_y)
                                 bouton_sauvegarde = bouton
                                 if (tuile != None) and (tuile in dico_plantes.keys()):  #Si une plante déjà placé sur la tuile...
-                                    print(True)
                                     dico_plantes[tuile].Mourir() #On supprime la plante en question
                                     
             ### fenetre
@@ -96,7 +107,6 @@ class Bouton:
         self.img = pygame.transform.scale(img, (int(self.largeur*scale), int(self.hauteur*scale)))
         self.est_Clique = False
         self.monnaie = model.Monnaie
-        
         self.x, self.y = x, y
         self.rect = self.img.get_rect(topleft = (self.x, self.y)) #synchronisation de la collision du bouton avec l'image
         
@@ -110,6 +120,7 @@ class Bouton:
         """
         self.est_Clique = False
         pygame.draw.rect(self.img, (0,0,0), [0, 0, self.rect.width, self.rect.height], 2)
+        
     def est_cible(self, x, y):
         """
         x et y : la position de la souris

@@ -4,7 +4,7 @@
 # Ce module comporte le code pour afficher le jeu
 
 import pygame, os, model
-from random import randint
+
 
 # des constantes
 SCREEN_WIDTH = 866
@@ -13,13 +13,13 @@ ecran =  pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT)) #optimisation : 
 couleur_boutons = (150, 150, 150)
 couleur_fond = (25,200,25)
 projectiles = []  #tableau de l'ensemble des projectiles
-Suns = []
+sprites_entites = {} #dicionaire dont les clés sont le nom des entités et les valeurs leur sprite d'animation sous la forme [[spriteAnimation1], [SpriteAnimation2]...]
+   
+
 
 #initialisation des images 
 image_pea = pygame.image.load("./ressources/Pea.png").convert_alpha() #optimisation - au lieu de load dans une classe, on la fait une fois ici
 image_pea = pygame.transform.scale(image_pea, (2000//70, 2000//70)) #cela permet de ne pas charger à chaque instance l'image lorsqu'un pea est tiré
-image_Sun = pygame.image.load("./ressources/SunPvZH.webp").convert_alpha()
-
 class View:
     """
     Une classe qui s'occupe de tout l'affichage.
@@ -53,17 +53,18 @@ class View:
         """
 
         if self.Jouer:
-            Argent = self.model.boutons["PeaShooter"].monnaie #Si les boutons sont bien initialisés
-            self.ecriturePoints = self.font.render(str(Argent), True, (0,0,0)) #ecriture du nombre d'argent
-            if  Argent > 1000:
-                self.ecriturePoints = self.font.render(str(1000)+'+', True, (0,0,0))
-            self.screen.blit(self.imp, (0, 0))
-            self.screen.blit(self.PointsUI, (0,400))
-            self.screen.blit(self.ecriturePoints, (32, 482)) #affichage de l'argent
+            if "PeaShooter" in self.model.boutons.keys():
+                Argent = self.model.boutons["PeaShooter"].monnaie #Si les boutons sont bien initialisés
+                self.ecriturePoints = self.font.render(str(Argent), True, (0,0,0)) #ecriture du nombre d'argent
+                if  Argent > 1000:
+                    self.ecriturePoints = self.font.render(str(1000)+'+', True, (0,0,0))
+                self.screen.blit(self.imp, (0, 0))
+                self.screen.blit(self.PointsUI, (0,400))
+                self.screen.blit(self.ecriturePoints, (32, 482)) #affichage de l'argent
+            else:
+                self.ecriturePoints = self.font.render(str(0)+'+', True, (0,0,0)) 
 
-        # redessine le fond si besoin:
-        #self.screen.fill(couleur_fond)
-
+    
         # deplace les elements du jeux
         for elem in self.elems:
             elem.update()
@@ -101,14 +102,16 @@ class ViewPersonnage(pygame.sprite.Sprite):
         #Initialisation des images
         self.personnage = personnage
         self.temps = 0
-        self.spritesMarche = []   #séquence d'image pour l'animation basique de toute entité
-        self.spritesManger = []  #séquence d'image pour l'animation manger des zombies
+        
         self.spritesTir = []  #séquence d'image pour l'animation de tir des plantes
         self.actuelle = 0 
-        if ("zombie" in str(personnage.nom)):
+        if ("zombie" in str(personnage.nom)) and (personnage.nom not in sprites_entites.keys()):
             self.TabAnimationZombie(personnage)
-        elif ("peaShooter"  in str(personnage.nom)) or  ("wallnut" in str(personnage.nom)):
+        elif ("peaShooter"  in str(personnage.nom)) or  ("wallnut" in str(personnage.nom) or ("sunFlower" in str(personnage.nom))):
             self.TabAnimationPlante(personnage)
+        self.spritesMarche = sprites_entites[personnage.nom][0]   #séquence d'image pour l'animation basique de toute entité
+        self.spritesManger =  sprites_entites[personnage.nom][1]   #séquence d'image pour l'animation manger des zombies
+        self.image = self.spritesMarche[0]
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = self.personnage.get_position()
         self.rect.topleft = (personnage.x, personnage.y)
@@ -132,7 +135,10 @@ class ViewPersonnage(pygame.sprite.Sprite):
                 self.image = pygame.transform.scale(self.image, (768//2, 724//2))
             elif "zombieX" in personnage.nom:
                 self.image = pygame.transform.scale(self.image, (226//2.1, 153//1.8))
-            self.spritesMarche.append(self.image)    #Initialisation d'un tableau contenant l'ensemble des image d'animation
+            if personnage.nom not in sprites_entites.keys(): #Si nous n'avons pas déjà chargé une animation de l'entité
+                sprites_entites[personnage.nom] = [self.image], [] #un tableau pour l'animation marche, un autre pour manger
+            sprites_entites[personnage.nom][0].append(self.image)
+                     #Initialisation d'un tableau contenant l'ensemble des image d'animation
             
         for i in range(1, len(os.listdir(f"ressources/{str(personnage.nom)}_manger"))):
             self.image = pygame.image.load(f"ressources/{str(personnage.nom)}_manger/frame-{i}.gif").convert_alpha()
@@ -143,12 +149,11 @@ class ViewPersonnage(pygame.sprite.Sprite):
             elif "Football" in personnage.nom:
                 self.image = pygame.transform.scale(self.image, (129//1.2, 156//1.2))
             
-            self.spritesManger.append(self.image) 
+
+            
+            sprites_entites[personnage.nom][1].append(self.image)  #Si nous n'avons pas chargé de tableau sprite pour l'animation manger
         
-        self.image = self.spritesMarche[self.actuelle]
-        
-        
-        #self.image = pygame.image.load(f"ressources/{str(personnage.nom)}.gif") #si c'est un zombie, on met la version gif
+
         
     def Pea_Apparaitre(self):
         """
@@ -163,15 +168,6 @@ class ViewPersonnage(pygame.sprite.Sprite):
             Pea = model.Pea(self.personnage.tuile, 1, self.personnage.degats, "Pea")
             projectiles.append(Pea)
 
-    def Sun_Apparaitre(self):
-        """
-        Cette fonction permet au PeaShooter d'envoyer un projectile (Pea). 
-        Le délai est géré par la vitesse d'animation, lorsqu'une certaine frame spécifique est atteinte, 
-        une nouvelle instance Pea est automatiquement créé et répertiorié dans la variable globale "projectiles" dont les éléments
-        sont mis à jour dans le while du main.
-        """
-        Sun = model.Sun(randint(1,45), "Sun")
-        Suns.append(Sun)
         
         
     def TabAnimationPlante(self, personnage):
@@ -185,20 +181,29 @@ class ViewPersonnage(pygame.sprite.Sprite):
              
             self.image = pygame.image.load(f"ressources/{str(personnage.nom)}_marche/frame-{i}.gif").convert_alpha()
             if "pea" in self.personnage.nom:
-                self.image = pygame.transform.scale(self.image, (185//2.7, 157//2.7))
+                self.image = pygame.transform.scale(self.image, (185//2.7, 157//2.7)) #On ajuste la taille de l'image en fonction du nom
             if "wallnut" in self.personnage.nom:
                 self.image = pygame.transform.scale(self.image, (64//1.2, 72//1.2))
-            self.spritesMarche.append(self.image)    #Initialisation d'un tableau contenant l'ensemble des image d'animation basique
-            self.image = self.spritesMarche[self.actuelle]
+            if "sunFlower" in self.personnage.nom:
+                self.image = pygame.transform.scale(self.image, (360//4, 360//4))
+            if personnage.nom not in sprites_entites.keys(): #Si nous n'avons pas déjà chargé une animation de l'entité
+                sprites_entites[personnage.nom] = [self.image], [] #un tableau pour l'animation marche, un autre tirer 
+            sprites_entites[personnage.nom][0].append(self.image)
+            
         if "pea" in self.personnage.nom: #seul les peas peuvent tirer, donc seuls eux ont une animation de tir
             for i in range(1, len(os.listdir(f"ressources/{str(personnage.nom)}_tir"))):
                 self.image = pygame.image.load(f"ressources/{str(personnage.nom)}_tir/frame-{i}.gif").convert_alpha()
                 self.image = pygame.transform.scale(self.image, (185//2.7, 157//2.7))
-                self.spritesTir.append((self.image, f"frame-{i}.gif"))    #Initialisation d'un tableau contenant l'ensemble des image d'animation de tir
-                self.image = self.spritesMarche[self.actuelle]
+                self.spritesTir.append((self.image, f"frame-{i}.gif"))    #Initialisation d'un tableau contenant l'ensemble des image d'animation de tirs avec le nom de la frame
+                sprites_entites[personnage.nom][1].append(self.image) 
 
     
     def animer(self, personnage, vitesse=0.0150):
+        """
+        personnage : - l'objet de la classe personnage.
+        vitesse : int, attribut qui représente la vitesse d'animation de la classe personnage.
+        Fonction pour parcourir les sprites de l'instance un à un.
+        """
         if not(self.personnage.Est_mort):
             self.rect.x, self.rect.y = self.personnage.get_position()
             
@@ -219,14 +224,14 @@ class ViewPersonnage(pygame.sprite.Sprite):
                     self.image = self.spritesMarche[int(self.actuelle)]
             if "pea" in personnage.nom:
                 if personnage.tirer:    #On charge l'animation de tir
-                    self.image = self.spritesTir[int(self.actuelle)][0]
+                    self.image = self.spritesTir[int(self.actuelle)]
                     self.Pea_Apparaitre()
                 else:
                     self.image = self.spritesMarche[int(self.actuelle)] #Si la plante ne tire pas, on la fait marcher.
             if "wallnut" in personnage.nom:
                 self.image = self.spritesMarche[int(self.actuelle)]
-            if "Sun" in personnage.nom:
-                self.Sun_Apparaitre()
+            if "sunFlower" in personnage.nom:
+                self.image = self.spritesMarche[int(self.actuelle)]
         else:
             self.image = None 
             
@@ -242,13 +247,16 @@ class ViewPersonnage(pygame.sprite.Sprite):
             if "zombie" in str(self.personnage.nom):
                 screen.blit(self.image, ((nouvelle_position[0] - self.image.get_width()/2), nouvelle_position[1] - self.image.get_height()+40))
             elif "pea" in str(self.personnage.nom):
-                screen.blit(self.image, ((nouvelle_position[0] - self.image.get_width()/2.5), nouvelle_position[1] - self.image.get_height()+30))
-                if len(projectiles) != 0: #si il y a un projectile tiré...
-                    for element in projectiles:
-                        screen.blit(element.image, ((element.get_position()[0] - self.image.get_width()/2.5)+60, element.get_position()[1] - self.image.get_height()+35))
+                
+                if self.personnage.tirer:
+                    screen.blit(self.image[0], ((nouvelle_position[0] - self.image[0].get_width()/2.5), nouvelle_position[1] - self.image[0].get_height()+30))
+                    if len(projectiles) != 0: #si il y a un projectile tiré...
+                        for element in projectiles:
+                            screen.blit(element.image, ((element.get_position()[0] - self.image[0].get_width()/2.5)+60, element.get_position()[1] - self.image[0].get_height()+35))
+                if not(self.personnage.tirer):
+                    screen.blit(self.image, ((nouvelle_position[0] - self.image.get_width()/2.5), nouvelle_position[1] - self.image.get_height()+30))
+                
             elif "wallnut" in str(self.personnage.nom):
                 screen.blit(self.image, ((nouvelle_position[0] - self.image.get_width()/2.5), nouvelle_position[1] - self.image.get_height()+30))
-            elif "Sun" in str(self.personnage.nom):
-                if len(Suns) != 0: #si il y a un projectile tiré...
-                    for element in Suns:
-                        screen.blit(element.image, ((element.get_position()[0] - self.image.get_width()/2.5)+60, element.get_position()[1] - self.image.get_height()+35))
+            elif "sunFlower" in str(self.personnage.nom):
+                screen.blit(self.image, ((nouvelle_position[0] - self.image.get_width()/2), nouvelle_position[1] - self.image.get_height()+30))
