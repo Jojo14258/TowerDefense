@@ -9,11 +9,13 @@ import time
 STEP_SIZE = 20
 vitesse = 0.04
 PlantesActuelles = [] #Création d'une pile : La dernière plante arrivée est ajouté au visuelle (voir main)
-ZombiesActuelles = []
-SunFlowersActuelles = [] #Tableau utilisé pour cumuler les boosts d'argent des sunflowers
+SunFlowersActuelles = {} #Tableau utilisé pour cumuler les boosts d'argent des sunflowers
+ZombiesActuelles = {}
+indice_zombie = 0 #permet de répertorier l'ordre d'ajout des zombies dans le dictionnaire ZombiesActuelles
+indice_sunflowers = 0 #Pour répertorier l'ordre d'ajout des sunflowers dans le dictionnaire SunFlowersActuelles
 NbPlantes = len(PlantesActuelles)
 NbZombies = len(ZombiesActuelles)
-NbSunFlowers = 0
+NbSunFlowers = len(SunFlowersActuelles)
 Monnaie = 100
 def carteVersMatrice(x, y):
     """
@@ -174,7 +176,9 @@ class Zombie(Personnage):
         self.manger = False
         self.time = 0
         self.a_Perdu = False
-        ZombiesActuelles.append(self)
+        global indice_zombie
+        indice_zombie += 1
+        ZombiesActuelles[self] = (self, indice_zombie)
         dico_zombies[self.tuilesParcourues[-1]][self] = self
         self.apparaitre(self.ligne)
       
@@ -200,6 +204,7 @@ class Zombie(Personnage):
         Fonction qui retire toute référence à l'objet dans les variables globales et rend l'objet inactif.
         """
         del dico_zombies[self.tuilesParcourues[-1]][self]
+        del ZombiesActuelles[self]
         self.Est_mort = True
         
     def endommagerPlante(self):
@@ -221,7 +226,8 @@ class Zombie(Personnage):
             if (self.obtenir_tuile() != None) and not(self.obtenir_tuile() in (self.tuilesParcourues)): #si le zombie n'est pas sorti de la map et que sa position n'a pas été ajouté...
                 self.tuilesParcourues.append(self.obtenir_tuile())
                 dico_zombies[self.tuilesParcourues[-1]][self] = self #on met à jour la position du zombie dans le dictionnaire
-                del dico_zombies[self.tuilesParcourues[-2]][self]  #on supprime son ancienne position
+                if self in dico_zombies[self.tuilesParcourues[-2]].keys():
+                    del dico_zombies[self.tuilesParcourues[-2]][self]  #on supprime son ancienne position
             if self.est_presentPlante():
                 self.vitesse_marche = 0 #On arrête de faire marcher le zombie pendant qu'il mange
                 self.manger = True   
@@ -311,7 +317,7 @@ class SunFlower(Personnage):
     """
     Une sous classe PeaShooter (plante) enfant de la classe Personnage.
     """
-    def __init__(self, nom, tuile,vitesse, pv, degats, recharge):
+    def __init__(self, nom, tuile,vitesse, pv):
         super().__init__(nom, NPC=True)
        
         self.tuile = tuile
@@ -320,12 +326,11 @@ class SunFlower(Personnage):
         self.vitesse = vitesse
         self.tirer = False
         self.pv = pv
-        self.degats = degats
-        self.recharge = recharge
         self.collider = None #valeur assigné dans le viewPersonnage
         dico_plantes[tuile] = self
+        global indice_sunflowers
+        SunFlowersActuelles[self] = (self, indice_sunflowers)
         PlantesActuelles.append(self)
-        SunFlowersActuelles.append(self)
         
     def apparaitre(self, tuile):
         self.x = ((dictiTuile[tuile][0][1]+dictiTuile[tuile][0][0])//2)
@@ -349,12 +354,12 @@ class SunFlower(Personnage):
         Supprime toute les références à l'instance afin de supprimer l'instance complètement.
         """
         del dico_plantes[self.tuile] #on supprime toute les références à l'objet
+        del SunFlowersActuelles[self]
         self.Est_mort = True
 
         
                     
     def update(self): #surcharge de la classe précédente 
-        
         if not(self.Est_mort):
             if self.pv <= 0:
                 self.Mourir()
@@ -389,10 +394,11 @@ class Pea(Personnage):
         
     def endommagerZombie(self):
         tuile = self.Tuiles_Parcourues[-1]
-        for mort_vivants in dico_zombies[tuile].keys():      
-            if self.collider.colliderect(mort_vivants.collider) and not(self.Est_mort):
-                mort_vivants.pv -= self.degats
-                self.Est_mort = True
+        for mort_vivants in dico_zombies[tuile].keys():  
+            if mort_vivants.collider != None: #Sécurité en cas de problème avec la collision
+                if self.collider.colliderect(mort_vivants.collider) and not(self.Est_mort):
+                    mort_vivants.pv -= self.degats
+                    self.Est_mort = True
                 
     def apparaitre(self, tuile):
         self.x = ((dictiTuile[tuile][0][1]+dictiTuile[tuile][0][0])//2)

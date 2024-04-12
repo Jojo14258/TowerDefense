@@ -16,14 +16,17 @@ try:
     controller = Controller(model)
     compteur = 0
     compteur1 = 0
-    compteur2 = 0
-    zombies_par_niveaux = {1: {"zombie1": 5}, 2:{"zombie1": 5, "zombieFootball":5}} #dictionnaire de la forme {niveau: {zombies:nombre} }. Permet de définir le nombre de zombies par niveaux.
-    Nombre_zombie_par_niveaux = {1:5, 2:10}
-    zombies_caracteristiques = {"zombie1":["zombie1", randint(1,5), 0.3, 0.5, 200, 100], "zombieFootball": ["zombieFootball", randint(1,5), 0.9, 0.2, 200, 100]}
+    frequence = 0
+    DelaiAvantVague = 0
+    indice_dernierZombie = 0
+    indice_dernierSunflower = 0
+    zombies_par_niveaux = {1: {"zombie1": 5}, 2:{"zombie1": 5, "zombieFootball":5}, 3:{"zombieFootball":0, "zombieX": 5}, 4:{"zombie1":8, "zombieFootball":7, "zombieX":0}, 4:{"zombie1":15, "zombieFootball":15, "zombieX":0}, 5:{"zombie1":15, "zombieFootball":30, "zombieX":15, "zombieGargantuar":1}} #dictionnaire de la forme {niveau: {zombies:nombre} }. Permet de définir le nombre de zombies par niveaux.
+    Temps_par_niveaux = {1:600, 2:(500), 3:(400), 4:(200), 5:(100)}  #Format : {NumeroTuile[Frequence_D'apparition_Zombie]}
+    zombies_caracteristiques = {"zombie1":["zombie1", randint(1,5), 100, 0.5, 200, 120], "zombieFootball": ["zombieFootball", randint(1,5), 1.1, 0.2, 200, 100], "zombieGargantuar":["zombieGargantuar", 4, 0.1, 0.2, 3000, 100],  "zombieX":["zombieX", 1, 0.7, 0.7, 200, 100]}
     niveau_actuel = 1
     Perdu = False
-    recommencer = False
-    #print(map(220,  154))
+
+
     
     
     
@@ -34,6 +37,7 @@ try:
     img3 = pygame.image.load("./ressources/boutons/JouerBouton.png").convert_alpha()
     img4 = pygame.image.load("./ressources/boutons/pelle.png").convert_alpha()
     img5 = pygame.image.load("./ressources/boutons/sunflower.png").convert_alpha()
+    img6 = pygame.image.load("ressources/Invisible.jpg")
     #bouton1 = Bouton("bouton1", 30, 30, 100, 50, "clique")
     PeaShooterBouton = Bouton("PeaShooter", 0, 0,  img, 1)
     WallnutBouton = Bouton("Wallnut", 0, 60,  img2, 1)
@@ -43,34 +47,8 @@ try:
     
     model.ajouter_bouton(BoutonJouer)
 
-    # le personnage et son image:
-    perso = Personnage(str("perso"),False) #2 attributs, nom et si NPC
-    #zombie4 = Zombie("zombieX", 4, 0.7, 0.7, 200, 100) 
-    #zombie4 = Zombie("zombieX", 2, 0.7, 0.7, 200, 100)
-    #zombie4 = Zombie("zombieX", 1, 0.7, 0.7, 200, 100)
-    #zombie5 = Zombie("zombieFootball", 1, 0.9, 0.2, 200, 100)
-    #zombie6 = Zombie("zombieFootball", 5, 0.9, 0.2, 200, 100)
-    #zombie6 = Zombie("zombieFootball", 4, 0.9, 0.2, 200, 100)
-    #zombie7 = Zombie("zombieGargantuar", 4, 0.1, 0.2, 2000, 100)
-    #zombie1 = Zombie("zombie1", 1, 0.3, 0.5, 200, 100)  
-    #zombie1 = Zombie("zombie1", 4, 0.3, 0.4, 200, 100)  
-    #zombie1 = Zombie("zombie1", 5, 0.3, 0.5, 200, 100)  
-    #zombie1 = Zombie("zombie1", 3, 0.3, 0.45, 200, 100)  
-    #zombie1 = Zombie("zombie1", 4, 0.3, 0.5, 200, 100)  
-    #zombie2 = Zombie("zombie1", 2, 0.3, 0.5, 200, 100) 
-    #zombie3 = Zombie("zombie1", 3, 0.3, 0.5, 200, 100) 
-    
-    perso.set_position((300, 300))
-    model.personnage = perso
-    #modelZombie.personnage = zombie1
-    #modelZombie.persozombie2 = Zombie("zombie1", 2) 
-
-    #vue_perso = ViewPersonnage(perso)
-   
-    #view.add_elem(vue_perso)
   
    
-    ligne = 1
     clock = pygame.time.Clock()
     
     #--------------------------------Fonctions essentielles du jeu-------------------#
@@ -85,20 +63,25 @@ try:
         model.ajouter_bouton(BoutonEffacer)
         view.Jouer = True #On active la fenêtre de jeu
         global NbPlantes
-        global NbZombies
+        global indice_dernierSunflower
         global NbSunFlowers
         global Perdu
-        if len(PlantesActuelles) > NbPlantes: #Si unne plante  a été ajoutée...
+        global indice_dernierZombie
+        if len(PlantesActuelles) > NbPlantes: #Si une plante  a été ajoutée...
             view.add_elem(ViewPersonnage(PlantesActuelles[-1])) #Ajout du dernier PeaShooter (Pile)
             NbPlantes = len(PlantesActuelles) #on réajuste le total
-        if len(ZombiesActuelles) > NbZombies: 
-            view.add_elem(ViewPersonnage(ZombiesActuelles[-1])) 
-            NbZombies = len(ZombiesActuelles) 
         
-        for element in dico_zombies.values():
+        global SunFlower
+        global indice_dernierZombie
+        for sunflower_tuple in SunFlowersActuelles.values():
+            if sunflower_tuple[1] >  indice_dernierSunflower:
+                indice_dernierSunflower = sunflower_tuple[1]
+            
+        NbSunFlowers = len(SunFlowersActuelles) 
+        for element in dico_zombies.values(): #Cette ligne permet de vérifier qu'un zombie ait passé la pelouse
             for zombies in element.values():
-                if zombies.a_Perdu:
-                    Perdu = True
+                if zombies.a_Perdu: 
+                    Perdu = True  #Alors on arrête le jeu via le changement de cette variable
     
 
     
@@ -117,14 +100,28 @@ try:
                 longueur_projectile_list = len(projectiles) #Mise à jour longueur list pour éviter un out of range
             indice_projectile += 1
     
+    
+    def Mettre_a_jour_Zombies():
+        """
+        Une boucle qui met à jour le compteur de zombies. Le compteur de zombies est utilisé dans 
+        la fonction niveau afin de passer d'un niveau en plus quand tous les zombies sont morts.
+        """
+        global NbZombies
+        global indice_dernierZombie
+        for zombie_tuple in ZombiesActuelles.values():
+            if zombie_tuple[1] >  indice_dernierZombie:
+                indice_dernierZombie = zombie_tuple[1]
+                view.add_elem(ViewPersonnage(zombie_tuple[0]))
+        NbZombies = len(ZombiesActuelles) 
+         
     def ajouter_monnaie():
         """
         Une fonction pour ajouter de l'argent à chaque intervalle de temps.
         """
         global compteur
-        compteur += 1*NbSunFlowers
-     
-        if compteur > 600:
+        compteur += 1+0.5*NbSunFlowers
+        if compteur > 900: #Note : 600 tics correspondent à 10 secondes
+            print("T")
             compteur = 0
             model.boutons["PeaShooter"].monnaie += 50
 
@@ -134,27 +131,41 @@ try:
         """
         global NbZombies
         global compteur1
-        global compteur2
+        global DelaiAvantVague
         global zombies_par_niveaux
         global niveau_actuel
         global zombies_caracteristiques
+        global frequence
+        Passer_niveau_suivant = True
+        print("Niv Actuel", niveau_actuel) 
         for zombie, nombre in zombies_par_niveaux[niveau_actuel].items():
+            Mettre_a_jour_Zombies()
             if  zombies_par_niveaux[niveau_actuel][zombie] > 0:
                 compteur1 += 1
-                compteur2 += 1 
-                if True: #nous ajoutons une condition de compteur par dessus l'autre car randint peut générer une valeur au-dessus de compteur
-                    compteur2 = 0
-                    Frequence = randint(400, 500)
-                    if compteur1 > Frequence: 
-                        
+                DelaiAvantVague += 1 
+                if DelaiAvantVague > 400:
+                    frequence += 1
+                    if randint(Temps_par_niveaux[niveau_actuel]-1,Temps_par_niveaux[niveau_actuel]+4 ) < frequence: 
+                        frequence = 0
                         nom, ligne, vitesse_marche, vitesse, pv, degats = zombies_caracteristiques[zombie][0], randint(1, 5), zombies_caracteristiques[zombie][2], zombies_caracteristiques[zombie][3], zombies_caracteristiques[zombie][4], zombies_caracteristiques[zombie][5]
                         Zombie(nom, ligne, vitesse_marche, vitesse, pv, degats)
                         zombies_par_niveaux[niveau_actuel][zombie] -= 1
-                        compteur1 = 0 
+                        compteur1 = 0
                         
                         #print(zombies_par_niveaux[niveau_actuel][zombie])
-                        if zombies_par_niveaux[niveau_actuel][zombie] == 0:
-                            niveau_actuel += 1
+                        
+                        
+                    
+        
+            elif NbZombies == 0:
+                
+                for nombre in zombies_par_niveaux[niveau_actuel].values():
+                    if nombre >0:
+                        Passer_niveau_suivant = False # Ici on fixe un ancien bug : on s'assure qu'il n'y ait plus de zombies à spawn
+                Mettre_a_jour_Zombies() #On vérifie une dernière fois que tous les zombies ont été tués 
+                if (NbZombies == 0 and Passer_niveau_suivant):
+                    DelaiAvantVague = 400
+                    niveau_actuel += 1  
 
         
         
@@ -167,16 +178,14 @@ try:
     while not model.done:
         clock.tick(60)  #Le jeu est fait pour être joué à 60 FPS
         controller.gerer_input()
-        if (BoutonJouer.est_Clique) or (not(Perdu)):
+        if (BoutonJouer.est_Clique) and (not(Perdu)):
             jouer() #Le bug doit se trouver ici
-            print(len(ZombiesActuelles))
             ajouter_monnaie()
             niveau()
             NbSunFlowers = 0
-            if (Perdu):
-                BoutonJouer.est_Clique = False
+           # if (Perdu):
+            #    BoutonJouer.est_Clique = False
         elif Perdu:
-            print(False)
             zombies_stocker = []
             for tuiles in dico_zombies.values():
                 for zombies in tuiles:
@@ -188,17 +197,10 @@ try:
             if (dico_zombies != {}) or (dico_plantes != {}):
                 dico_zombies = {}
                 dico_plantes = {}
-            if "Jouer" not in model.boutons.keys():
-                BoutonJouer = Bouton("Jouer",200, 200, img3, 1)
-                model.ajouter_bouton(BoutonJouer)
-            if BoutonJouer.est_Clique:
-                NbPlantes = 0
-                NbZombies = 0
-                NbSunFlowers = 0
-                ZombiesActuelles = []
-                PlantesActuelles = []
-                Perdu = False
-        
+            BoutonPerdu = Bouton("Perdu",200, 200, img6, 1)
+            model.ajouter_bouton(BoutonPerdu)
+            
+             
         view.draw()
         pygame.display.flip()
 

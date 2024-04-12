@@ -34,6 +34,7 @@ class View:
         self.menu = pygame.image.load("ressources/Menu.jpg").convert_alpha()
         self.imp = pygame.image.load("./ressources/jardin.png").convert()
         self.PointsUI = pygame.image.load("ressources/UIPoints.png").convert_alpha()
+        self.gameOver =  pygame.image.load("ressources/GameOver.png").convert_alpha()
         self.font = pygame.font.SysFont(None, 24)
         self.ecriturePoints = self.font.render(str(100), True, (0,0,0))
         self.Jouer = False #Le mode jeu n'est pas encore activé
@@ -45,9 +46,10 @@ class View:
         return self.screen
 
     def add_elem(self, elem):
-        print("test")
         self.elems.append(elem)
 
+    def Perdu(self):
+        self.Perdu = True
     def draw(self):
         """
         Fonction appellée à la fin de chaque tour de simulation du jeu
@@ -65,12 +67,16 @@ class View:
             else:
                 self.ecriturePoints = self.font.render(str(0)+'+', True, (0,0,0)) 
 
-    
+            
         # deplace les elements du jeux
         for elem in self.elems:
             elem.update()
             elem.draw(self.screen)
-
+        
+        print(self.model.boutons.keys())
+        if "Perdu" in self.model.boutons.keys():
+            self.screen.blit(self.gameOver, (self.menu.get_rect().x, self.menu.get_rect().y))
+        
         # dessiner les boutons
         if "Jouer" in self.model.boutons.keys():
             if self.model.boutons["Jouer"].est_Clique: #Si le bouton "jouer" du menu est cliqué..."

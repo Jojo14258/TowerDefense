@@ -74,7 +74,7 @@ class Controller:
                                 bouton_sauvegarde = bouton
                                 if Monnaie - 50 >=0: #Si le joueur a assez d'argent...
                                     if (tuile != None) and (tuile not in dico_plantes.keys()):  #Si une plante n'est pas déjà placé sur la tuile...
-                                        sunflower = SunFlower("sunFlower",tuile ,0.8, 600, 40, 5) 
+                                        sunflower = SunFlower("sunFlower",tuile ,0.8, 300) 
                                         sunflower.apparaitre(tuile)
                                         self.model.boutons["PeaShooter"].monnaie -= 50
                                         
