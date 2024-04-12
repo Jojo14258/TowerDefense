@@ -40,7 +40,7 @@ try:
     img4 = pygame.image.load("./ressources/boutons/pelle.png").convert_alpha()
     img5 = pygame.image.load("./ressources/boutons/sunflower.png").convert_alpha()
     img6 = pygame.image.load("ressources/Invisible.jpg").convert_alpha()
-    img6 = pygame.image.load("ressources/Victoire.png").convert_alpha()
+    img7 = pygame.image.load("ressources/Victoire.png").convert_alpha()
     #bouton1 = Bouton("bouton1", 30, 30, 100, 50, "clique")
     PeaShooterBouton = Bouton("PeaShooter", 0, 0,  img, 1)
     WallnutBouton = Bouton("Wallnut", 0, 60,  img2, 1)
