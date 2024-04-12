@@ -155,7 +155,6 @@ try:
                             compteur1 = 0
                 
                 elif (NbZombies == 0) and (not(niveau_actuel >= 6)):
-                    print(True)
                     for nombre in zombies_par_niveaux[niveau_actuel].values():
                         if nombre >0:
                             Passer_niveau_suivant = False # Ici on fixe un ancien bug : on s'assure qu'il n'y ait plus de zombies à spawn
