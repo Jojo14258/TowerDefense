@@ -20,11 +20,13 @@ try:
     DelaiAvantVague = 0
     indice_dernierZombie = 0
     indice_dernierSunflower = 0
-    zombies_par_niveaux = {1: {"zombie1": 5}, 2:{"zombie1": 5, "zombieFootball":5}, 3:{"zombieFootball":0, "zombieX": 5}, 4:{"zombie1":8, "zombieFootball":7, "zombieX":0}, 4:{"zombie1":15, "zombieFootball":15, "zombieX":0}, 5:{"zombie1":15, "zombieFootball":30, "zombieX":15, "zombieGargantuar":1}} #dictionnaire de la forme {niveau: {zombies:nombre} }. Permet de définir le nombre de zombies par niveaux.
+    zombies_par_niveaux = {1: {"zombie1": 5}, 2:{"zombie1": 5, "zombieFootball":5}, 3:{"zombieFootball":0, "zombieX": 5}, 4:{"zombie1":8, "zombieFootball":7, "zombieX":0}, 4:{"zombie1":15, "zombieFootball":15, "zombieX":0}, 5:{"zombie1":15, "zombieFootball":30, "zombieX":15, "zombieGargantuar":1}, 6:{}} #dictionnaire de la forme {niveau: {zombies:nombre} }. Permet de définir le nombre de zombies par niveaux.
     Temps_par_niveaux = {1:600, 2:(500), 3:(400), 4:(200), 5:(100)}  #Format : {NumeroTuile[Frequence_D'apparition_Zombie]}
-    zombies_caracteristiques = {"zombie1":["zombie1", randint(1,5), 100, 0.5, 200, 120], "zombieFootball": ["zombieFootball", randint(1,5), 1.1, 0.2, 200, 100], "zombieGargantuar":["zombieGargantuar", 4, 0.1, 0.2, 3000, 100],  "zombieX":["zombieX", 1, 0.7, 0.7, 200, 100]}
+    zombies_caracteristiques = {"zombie1":["zombie1", randint(1,5), 0.3, 0.5, 200, 120], "zombieFootball": ["zombieFootball", randint(1,5), 1.1, 0.2, 200, 100], "zombieGargantuar":["zombieGargantuar", 4, 0.1, 0.2, 3000, 100],  "zombieX":["zombieX", 1, 0.7, 0.7, 200, 100]}
     niveau_actuel = 1
     Perdu = False
+    Gagne = False
+  
 
 
     
@@ -37,7 +39,8 @@ try:
     img3 = pygame.image.load("./ressources/boutons/JouerBouton.png").convert_alpha()
     img4 = pygame.image.load("./ressources/boutons/pelle.png").convert_alpha()
     img5 = pygame.image.load("./ressources/boutons/sunflower.png").convert_alpha()
-    img6 = pygame.image.load("ressources/Invisible.jpg")
+    img6 = pygame.image.load("ressources/Invisible.jpg").convert_alpha()
+    img6 = pygame.image.load("ressources/Victoire.png").convert_alpha()
     #bouton1 = Bouton("bouton1", 30, 30, 100, 50, "clique")
     PeaShooterBouton = Bouton("PeaShooter", 0, 0,  img, 1)
     WallnutBouton = Bouton("Wallnut", 0, 60,  img2, 1)
@@ -121,7 +124,6 @@ try:
         global compteur
         compteur += 1+0.5*NbSunFlowers
         if compteur > 900: #Note : 600 tics correspondent à 10 secondes
-            print("T")
             compteur = 0
             model.boutons["PeaShooter"].monnaie += 50
 
@@ -137,35 +139,30 @@ try:
         global zombies_caracteristiques
         global frequence
         Passer_niveau_suivant = True
-        print("Niv Actuel", niveau_actuel) 
         for zombie, nombre in zombies_par_niveaux[niveau_actuel].items():
             Mettre_a_jour_Zombies()
-            if  zombies_par_niveaux[niveau_actuel][zombie] > 0:
-                compteur1 += 1
-                DelaiAvantVague += 1 
-                if DelaiAvantVague > 400:
-                    frequence += 1
-                    if randint(Temps_par_niveaux[niveau_actuel]-1,Temps_par_niveaux[niveau_actuel]+4 ) < frequence: 
-                        frequence = 0
-                        nom, ligne, vitesse_marche, vitesse, pv, degats = zombies_caracteristiques[zombie][0], randint(1, 5), zombies_caracteristiques[zombie][2], zombies_caracteristiques[zombie][3], zombies_caracteristiques[zombie][4], zombies_caracteristiques[zombie][5]
-                        Zombie(nom, ligne, vitesse_marche, vitesse, pv, degats)
-                        zombies_par_niveaux[niveau_actuel][zombie] -= 1
-                        compteur1 = 0
-                        
-                        #print(zombies_par_niveaux[niveau_actuel][zombie])
-                        
-                        
-                    
-        
-            elif NbZombies == 0:
+            if niveau_actuel != 6: #lorsque le joueur atteint le niveau 6, il a gagné.
+                if zombies_par_niveaux[niveau_actuel][zombie] > 0:
+                    compteur1 += 1
+                    DelaiAvantVague += 1 
+                    if DelaiAvantVague > 400:
+                        frequence += 1
+                        if randint(Temps_par_niveaux[niveau_actuel]-1,Temps_par_niveaux[niveau_actuel]+4 ) < frequence: 
+                            frequence = 0
+                            nom, ligne, vitesse_marche, vitesse, pv, degats = zombies_caracteristiques[zombie][0], randint(1, 5), zombies_caracteristiques[zombie][2], zombies_caracteristiques[zombie][3], zombies_caracteristiques[zombie][4], zombies_caracteristiques[zombie][5]
+                            Zombie(nom, ligne, vitesse_marche, vitesse, pv, degats)
+                            zombies_par_niveaux[niveau_actuel][zombie] -= 1
+                            compteur1 = 0
                 
-                for nombre in zombies_par_niveaux[niveau_actuel].values():
-                    if nombre >0:
-                        Passer_niveau_suivant = False # Ici on fixe un ancien bug : on s'assure qu'il n'y ait plus de zombies à spawn
-                Mettre_a_jour_Zombies() #On vérifie une dernière fois que tous les zombies ont été tués 
-                if (NbZombies == 0 and Passer_niveau_suivant):
-                    DelaiAvantVague = 400
-                    niveau_actuel += 1  
+                elif (NbZombies == 0) and (not(niveau_actuel >= 6)):
+                    print(True)
+                    for nombre in zombies_par_niveaux[niveau_actuel].values():
+                        if nombre >0:
+                            Passer_niveau_suivant = False # Ici on fixe un ancien bug : on s'assure qu'il n'y ait plus de zombies à spawn
+                    Mettre_a_jour_Zombies() #On vérifie une dernière fois que tous les zombies ont été tués 
+                    if (NbZombies == 0 and Passer_niveau_suivant):
+                        DelaiAvantVague = 400
+                        niveau_actuel += 1  
 
         
         
@@ -178,13 +175,14 @@ try:
     while not model.done:
         clock.tick(60)  #Le jeu est fait pour être joué à 60 FPS
         controller.gerer_input()
-        if (BoutonJouer.est_Clique) and (not(Perdu)):
+        if (BoutonJouer.est_Clique) and (not(Perdu) and not(Gagne)):
             jouer() #Le bug doit se trouver ici
             ajouter_monnaie()
             niveau()
+            if niveau_actuel >= 6:
+                Gagne = True
             NbSunFlowers = 0
-           # if (Perdu):
-            #    BoutonJouer.est_Clique = False
+            
         elif Perdu:
             zombies_stocker = []
             for tuiles in dico_zombies.values():
@@ -200,6 +198,20 @@ try:
             BoutonPerdu = Bouton("Perdu",200, 200, img6, 1)
             model.ajouter_bouton(BoutonPerdu)
             
+        elif Gagne:
+            zombies_stocker = []
+            for tuiles in dico_zombies.values():
+                for zombies in tuiles:
+                    zombies_stocker.append(zombies)
+            for zombies in zombies_stocker:
+                zombies.Mourir()
+            View.jouer = False
+            model.reinitialiser_boutons()
+            if (dico_zombies != {}) or (dico_plantes != {}):
+                dico_zombies = {}
+                dico_plantes = {}
+            BoutonPerdu = Bouton("Gagne", 120,120, img6, 2)
+            model.ajouter_bouton(BoutonPerdu)
              
         view.draw()
         pygame.display.flip()

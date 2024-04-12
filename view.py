@@ -20,6 +20,7 @@ sprites_entites = {} #dicionaire dont les clés sont le nom des entités et les 
 #initialisation des images 
 image_pea = pygame.image.load("./ressources/Pea.png").convert_alpha() #optimisation - au lieu de load dans une classe, on la fait une fois ici
 image_pea = pygame.transform.scale(image_pea, (2000//70, 2000//70)) #cela permet de ne pas charger à chaque instance l'image lorsqu'un pea est tiré
+
 class View:
     """
     Une classe qui s'occupe de tout l'affichage.
@@ -35,6 +36,7 @@ class View:
         self.imp = pygame.image.load("./ressources/jardin.png").convert()
         self.PointsUI = pygame.image.load("ressources/UIPoints.png").convert_alpha()
         self.gameOver =  pygame.image.load("ressources/GameOver.png").convert_alpha()
+        self.gameWon = pygame.image.load("ressources/EcranVictoire.png").convert_alpha()
         self.font = pygame.font.SysFont(None, 24)
         self.ecriturePoints = self.font.render(str(100), True, (0,0,0))
         self.Jouer = False #Le mode jeu n'est pas encore activé
@@ -73,9 +75,10 @@ class View:
             elem.update()
             elem.draw(self.screen)
         
-        print(self.model.boutons.keys())
         if "Perdu" in self.model.boutons.keys():
             self.screen.blit(self.gameOver, (self.menu.get_rect().x, self.menu.get_rect().y))
+        if "Gagne" in self.model.boutons.keys():
+            self.screen.blit(self.gameWon, (self.menu.get_rect().x, self.menu.get_rect().y))
         
         # dessiner les boutons
         if "Jouer" in self.model.boutons.keys():

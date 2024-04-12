@@ -16,7 +16,7 @@ indice_sunflowers = 0 #Pour répertorier l'ordre d'ajout des sunflowers dans le 
 NbPlantes = len(PlantesActuelles)
 NbZombies = len(ZombiesActuelles)
 NbSunFlowers = len(SunFlowersActuelles)
-Monnaie = 100
+Monnaie = 10000
 def carteVersMatrice(x, y):
     """
     x - int : Coordonnée en abscisse de la 1ere tuile (en haut à gauche).
