@@ -2,7 +2,7 @@ import pygame
 
 pygame.init()
 pygame.font.init()
-
+pygame.mixer.init()
 from model import *
 from controller import *
 from view import *
@@ -30,9 +30,9 @@ try:
 
 
     
-    
-    
-    
+    #La musique
+    pygame.mixer_music.load("ressources/pvzmusique.mp3")
+    pygame.mixer_music.play(-1)
     # les boutons:
     img = pygame.image.load("./ressources/boutons/Peashooter.png").convert_alpha()
     img2 = pygame.image.load("./ressources/boutons/WallNut.jpg").convert_alpha()
