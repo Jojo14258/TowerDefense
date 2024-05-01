@@ -22,7 +22,7 @@ try:
     indice_dernierSunflower = 0
     zombies_par_niveaux = {1: {"zombie1": 5}, 2:{"zombie1": 5, "zombieFootball":5}, 3:{"zombieFootball":0, "zombieX": 5}, 4:{"zombie1":8, "zombieFootball":7, "zombieX":0}, 4:{"zombie1":15, "zombieFootball":15, "zombieX":0}, 5:{"zombie1":15, "zombieFootball":30, "zombieX":15, "zombieGargantuar":1}, 6:{}} #dictionnaire de la forme {niveau: {zombies:nombre} }. Permet de définir le nombre de zombies par niveaux.
     Temps_par_niveaux = {1:600, 2:(500), 3:(400), 4:(200), 5:(100)}  #Format : {NumeroTuile[Frequence_D'apparition_Zombie]}
-    zombies_caracteristiques = {"zombie1":["zombie1", randint(1,5), 0.3, 0.5, 200, 120], "zombieFootball": ["zombieFootball", randint(1,5), 1.1, 0.2, 200, 100], "zombieGargantuar":["zombieGargantuar", 4, 0.1, 0.2, 3000, 100],  "zombieX":["zombieX", 1, 0.7, 0.7, 200, 100]}
+    zombies_caracteristiques = {"zombie1":["zombie1", randint(1,5), 0.3, 0.5, 200, 120], "zombieFootball": ["zombieFootball", randint(1,5), 1.1, 0.2, 200, 100], "zombieGargantuar":["zombieGargantuar", 4, 0.1, 0.2, 3000, 150],  "zombieX":["zombieX", 1, 0.7, 0.7, 200, 110]}
     niveau_actuel = 1
     Perdu = False
     Gagne = False
